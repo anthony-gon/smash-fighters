@@ -12,6 +12,7 @@ public class SpriteSheet {
 	protected int columnLength;
 
 	public SpriteSheet(BufferedImage image, int spriteWidth, int spriteHeight) {
+		
 		this.image = image;
 		this.spriteWidth = spriteWidth;
 		this.spriteHeight = spriteHeight;
