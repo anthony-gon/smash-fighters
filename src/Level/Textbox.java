@@ -17,7 +17,7 @@ public class Textbox {
     protected int gap = 0; // horizontal space between lines of text -- only matters with multiline text
 
     public Textbox(String text) {
-        Font font = new Font("Arial", Font.PLAIN, 12);
+        Font font = new Font("fibberish", Font.PLAIN, 12);
         Point textLocation = new Point(x + hPadding + borderThickness, y + vPadding + borderThickness);
         spriteFont = new SpriteFont(text, textLocation.x, textLocation.y,  font, Color.black);
     }
