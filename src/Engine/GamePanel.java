@@ -6,6 +6,8 @@ import Utils.Colors;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 /*
  * This is where the game loop process and render back buffer is setup
@@ -49,6 +51,20 @@ public class GamePanel extends JPanel {
 		fpsDisplayLabel = new SpriteFont("FPS", 4, 3, "fibberish", 12, Color.black);
 
 		currentFPS = Config.TARGET_FPS;
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            Font font;
+			try {
+				font = Font.createFont(Font.TRUETYPE_FONT, new File("Resources/fonts/fibberish.ttf")).deriveFont(30f);
+				ge.registerFont(font);
+			} catch (FontFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 
 		// this game loop code will run in a separate thread from the rest of the program
 		// will continually update the game's logic and repaint the game's graphics
