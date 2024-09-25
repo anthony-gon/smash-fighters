@@ -6,63 +6,70 @@ import Engine.Screen;
 import Screens.CreditsScreen;
 import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
+import Screens.PracticeRangeScreen; // Import the new Practice Range screen
 
 /*
  * Based on the current game state, this class determines which Screen should be shown
  * There can only be one "currentScreen", although screens can have "nested" screens
  */
 public class ScreenCoordinator extends Screen {
-	// currently shown Screen
-	protected Screen currentScreen = new DefaultScreen();
+    // Currently shown Screen
+    protected Screen currentScreen = new DefaultScreen();
 
-	// keep track of gameState so ScreenCoordinator knows which Screen to show
-	protected GameState gameState;
-	protected GameState previousGameState;
+    // Keep track of gameState so ScreenCoordinator knows which Screen to show
+    protected GameState gameState;
+    protected GameState previousGameState;
 
-	public GameState getGameState() {
-		return gameState;
-	}
+    public GameState getGameState() {
+        return gameState;
+    }
 
-	// Other Screens can set the gameState of this class to force it to change the currentScreen
-	public void setGameState(GameState gameState) {
-		this.gameState = gameState;
-	}
+    // Other Screens can set the gameState of this class to force it to change the currentScreen
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
 
-	@Override
-	public void initialize() {
-		// start game off with Menu Screen
-		gameState = GameState.MENU;
-	}
+    @Override
+    public void initialize() {
+        // Start game off with Menu Screen
+        gameState = GameState.MENU;
+    }
 
-	@Override
-	public void update() {
-		do {
-			// if previousGameState does not equal gameState, it means there was a change in gameState
-			// this triggers ScreenCoordinator to bring up a new Screen based on what the gameState is
-			if (previousGameState != gameState) {
-				switch(gameState) {
-					case MENU:
-						currentScreen = new MenuScreen(this);
-						break;
-					case LEVEL:
-						currentScreen = new PlayLevelScreen(this);
-						break;
-					case CREDITS:
-						currentScreen = new CreditsScreen(this);
-						break;
-				}
-				currentScreen.initialize();
-			}
-			previousGameState = gameState;
+    @Override
+    public void update() {
+        // Check for state change
+        if (previousGameState != gameState) {
+            switch(gameState) {
+                case MENU:
+                    currentScreen = new MenuScreen(this);
+                    break;
+                case LEVEL:
+                    currentScreen = new PlayLevelScreen(this);
+                    break;
+                case CREDITS:
+                    currentScreen = new CreditsScreen(this);
+                    break;
+                case PRACTICE_RANGE: // Handle Practice Range state
+                    int windowWidth = 800; // Replace with your actual width
+                    int windowHeight = 600; // Replace with your actual height
+                    currentScreen = new PracticeRangeScreen(windowWidth, windowHeight); // Pass width and height
+                    break;
+            }
+            currentScreen.initialize();
+        }
+        previousGameState = gameState;
 
-			// call the update method for the currentScreen
-			currentScreen.update();
-		} while (previousGameState != gameState);
-	}
+        // Call the update method for the currentScreen
+        if (currentScreen != null) {
+            currentScreen.update();
+        }
+    }
 
-	@Override
-	public void draw(GraphicsHandler graphicsHandler) {
-		// call the draw method for the currentScreen
-		currentScreen.draw(graphicsHandler);
-	}
+    @Override
+    public void draw(GraphicsHandler graphicsHandler) {
+        // Call the draw method for the currentScreen
+        if (currentScreen != null) {
+            currentScreen.draw(graphicsHandler);
+        }
+    }
 }
