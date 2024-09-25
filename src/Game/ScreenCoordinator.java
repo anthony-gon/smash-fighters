@@ -6,11 +6,12 @@ import Engine.Screen;
 import Screens.CreditsScreen;
 import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
-import Screens.PracticeRangeScreen; // Import the new Practice Range screen
+import Screens.PracticeRangeScreen;
+import Screens.HowToPlayScreen;
 
 /*
- * Based on the current game state, this class determines which Screen should be shown
- * There can only be one "currentScreen", although screens can have "nested" screens
+ * Based on the current game state, this class determines which Screen should be shown.
+ * There can only be one "currentScreen", although screens can have "nested" screens.
  */
 public class ScreenCoordinator extends Screen {
     // Currently shown Screen
@@ -39,7 +40,7 @@ public class ScreenCoordinator extends Screen {
     public void update() {
         // Check for state change
         if (previousGameState != gameState) {
-            switch(gameState) {
+            switch (gameState) {
                 case MENU:
                     currentScreen = new MenuScreen(this);
                     break;
@@ -49,12 +50,16 @@ public class ScreenCoordinator extends Screen {
                 case CREDITS:
                     currentScreen = new CreditsScreen(this);
                     break;
-                case PRACTICE_RANGE: // Handle Practice Range state
+                case PRACTICE_RANGE:
                     int windowWidth = 800; // Replace with your actual width
                     int windowHeight = 600; // Replace with your actual height
-                    currentScreen = new PracticeRangeScreen(windowWidth, windowHeight); // Pass width and height
+                    currentScreen = new PracticeRangeScreen(windowWidth, windowHeight);
+                    break;
+                case HOW_TO_PLAY:
+                    currentScreen = new HowToPlayScreen(this); // Transition to HowToPlayScreen
                     break;
             }
+            // Initialize the new screen after changing it
             currentScreen.initialize();
         }
         previousGameState = gameState;

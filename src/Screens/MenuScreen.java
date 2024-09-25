@@ -6,7 +6,10 @@ import Game.ScreenCoordinator;
 import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
+
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 // This is the class for the main menu screen
 public class MenuScreen extends Screen {
@@ -16,10 +19,23 @@ public class MenuScreen extends Screen {
     protected SpriteFont playGame;
     protected SpriteFont credits;
     protected SpriteFont practiceRange; // New sprite font for Practice Range
+    protected SpriteFont howToPlay; // New sprite font for How To Play
+    protected SpriteFont gameTitle; // Title of the game "Smash Fighters"
+    protected List<SpriteFont> menuItems; // List to hold all menu items
     protected Map background;
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
+    protected int pointerOffsetX = 30;
+    protected int pointerOffsetY = 7;
     protected KeyLocker keyLocker = new KeyLocker();
+
+    // Variables for oscillating the title size
+    protected int titleSize = 40;
+    protected int titleSizeChange = 1;
+    protected int minTitleSize = 35;
+    protected int maxTitleSize = 50;
+    protected int titleSizeChangeDelay = 0; // Delay counter for size change
+    protected int titleSizeChangeDelayMax = 5; // Max delay before size change
 
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -27,16 +43,31 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        playGame = new SpriteFont("PLAY GAME", 200, 123, "fibberish", 30, new Color(49, 207, 240));
+        // Initialize the menu items
+        playGame = new SpriteFont("PLAY GAME", 300, 150, "fibberish", 30, new Color(49, 207, 240));
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
-        credits = new SpriteFont("CREDITS", 200, 223, "fibberish", 30, new Color(49, 207, 240));
-        credits.setOutlineColor(Color.black);
-        credits.setOutlineThickness(3);
-        practiceRange = new SpriteFont("PRACTICE RANGE", 200, 323, "fibberish", 30, new Color(49, 207, 240));
+
+        practiceRange = new SpriteFont("PRACTICE RANGE", 300, 250, "fibberish", 30, new Color(49, 207, 240));
         practiceRange.setOutlineColor(Color.black);
         practiceRange.setOutlineThickness(3);
-        
+
+        howToPlay = new SpriteFont("HOW TO PLAY", 300, 350, "fibberish", 30, new Color(49, 207, 240));
+        howToPlay.setOutlineColor(Color.black);
+        howToPlay.setOutlineThickness(3);
+
+        credits = new SpriteFont("CREDITS", 680, 540, "fibberish", 30, new Color(49, 207, 240));
+        credits.setOutlineColor(Color.black);
+        credits.setOutlineThickness(3);
+
+        // Add items to the menuItems list in the correct order
+        menuItems = Arrays.asList(playGame, practiceRange, howToPlay, credits);
+
+        // Initialize the game title "Smash Fighters" in the top right corner
+        gameTitle = new SpriteFont("SMASH FIGHTERS", 100, 50, "fibberish", titleSize, new Color(255, 69, 0));
+        gameTitle.setOutlineColor(Color.black);
+        gameTitle.setOutlineThickness(5);
+
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
         keyPressTimer = 0;
@@ -62,32 +93,14 @@ public class MenuScreen extends Screen {
         }
 
         // Loop the selection back around
-        if (currentMenuItemHovered > 2) {
+        if (currentMenuItemHovered >= menuItems.size()) {
             currentMenuItemHovered = 0;
         } else if (currentMenuItemHovered < 0) {
-            currentMenuItemHovered = 2;
+            currentMenuItemHovered = menuItems.size() - 1;
         }
 
-        // Set color and position for the pointer
-        if (currentMenuItemHovered == 0) {
-            playGame.setColor(new Color(255, 215, 0));
-            credits.setColor(new Color(49, 207, 240));
-            practiceRange.setColor(new Color(49, 207, 240));
-            pointerLocationX = 170;
-            pointerLocationY = 130;
-        } else if (currentMenuItemHovered == 1) {
-            playGame.setColor(new Color(49, 207, 240));
-            credits.setColor(new Color(255, 215, 0));
-            practiceRange.setColor(new Color(49, 207, 240));
-            pointerLocationX = 170;
-            pointerLocationY = 230;
-        } else if (currentMenuItemHovered == 2) { // For Practice Range
-            playGame.setColor(new Color(49, 207, 240));
-            credits.setColor(new Color(49, 207, 240));
-            practiceRange.setColor(new Color(255, 215, 0));
-            pointerLocationX = 170;
-            pointerLocationY = 330;
-        }
+        // Update pointer location
+        updatePointerLocation();
 
         // Handle selection
         if (Keyboard.isKeyUp(Key.SPACE)) {
@@ -97,19 +110,65 @@ public class MenuScreen extends Screen {
             menuItemSelected = currentMenuItemHovered;
             if (menuItemSelected == 0) {
                 screenCoordinator.setGameState(GameState.LEVEL);
-            } else if (menuItemSelected == 1) {
-                screenCoordinator.setGameState(GameState.CREDITS);
-            } else if (menuItemSelected == 2) { // If Practice Range is selected
+            } else if (menuItemSelected == 1) { // If Practice Range is selected
                 screenCoordinator.setGameState(GameState.PRACTICE_RANGE);
+            } else if (menuItemSelected == 2) { // If How to Play is selected
+                screenCoordinator.setGameState(GameState.HOW_TO_PLAY);
+            } else if (menuItemSelected == 3) { // If Credits is selected
+                screenCoordinator.setGameState(GameState.CREDITS);
             }
+        }
+
+        // Update the size of the title to oscillate between min and max sizes
+        updateTitleSize();
+    }
+
+    public void updatePointerLocation() {
+        // Loop over menuItems to set their colors and determine pointer location
+        for (int i = 0; i < menuItems.size(); i++) {
+            if (i == currentMenuItemHovered) {
+                menuItems.get(i).setColor(new Color(255, 215, 0)); // Highlighted color
+                // Set pointer location based on the current hovered item
+                pointerLocationX = (int) (menuItems.get(i).getX() - pointerOffsetX);
+                pointerLocationY = (int) (menuItems.get(i).getY() - pointerOffsetY);
+            } else {
+                menuItems.get(i).setColor(new Color(49, 207, 240)); // Default color
+            }
+        }
+    }
+
+    // Update title size to make it oscillate back and forth
+    public void updateTitleSize() {
+        // Increment the delay counter
+        if (titleSizeChangeDelay >= titleSizeChangeDelayMax) {
+            // Change the size of the title
+            titleSize += titleSizeChange;
+
+            // Check bounds and reverse direction if needed
+            if (titleSize >= maxTitleSize || titleSize <= minTitleSize) {
+                titleSizeChange *= -1;
+            }
+
+            // Update the title font size
+            gameTitle.setFontSize(titleSize);
+
+            // Reset the delay counter
+            titleSizeChangeDelay = 0;
+        } else {
+            // Increment the delay counter to slow down size change
+            titleSizeChangeDelay++;
         }
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
         background.draw(graphicsHandler);
-        playGame.draw(graphicsHandler);
-        credits.draw(graphicsHandler);
-        practiceRange.draw(graphicsHandler); // Draw Practice Range option
+        // Draw the title
+        gameTitle.draw(graphicsHandler);
+        // Draw each menu item
+        for (SpriteFont menuItem : menuItems) {
+            menuItem.draw(graphicsHandler);
+        }
+        // Draw the pointer
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
     }
 }

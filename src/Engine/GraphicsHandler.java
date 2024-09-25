@@ -123,4 +123,9 @@ public class GraphicsHandler {
         g.setStroke(originalStroke);
         g.setRenderingHints(originalHints);
     }
+
+    public void drawFilledPolygon(int[] xPoints, int[] yPoints, Color starColor) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'drawFilledPolygon'");
+    }
 }

@@ -5,4 +5,5 @@ package Game;
  */
 public enum GameState {
     MENU, LEVEL, CREDITS, PRACTICE_RANGE // Added PRACTICE_RANGE here
+, HOW_TO_PLAY
 }
