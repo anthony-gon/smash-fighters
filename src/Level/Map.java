@@ -76,7 +76,7 @@ public abstract class Map {
         this.endBoundY = height * tileset.getScaledSpriteHeight();
         this.xMidPoint = ScreenManager.getScreenWidth() / 2;
         this.yMidPoint = (ScreenManager.getScreenHeight() / 2);
-        this.playerStartPosition = new Point(0, 0);
+        this.playerStartPosition = new Point(30, 30);
     }
 
     // sets up map by reading in the map file to create the tile map

@@ -14,7 +14,8 @@ public class NPC extends MapEntity {
     protected boolean isInteractable = false;
     protected boolean talkedTo = false;
     protected SpriteFont message;
-    protected int talkedToTime; // how long after talking to NPC will textbox stay open -- use negative number to have it be infinite time
+    protected int talkedToTime; // how long after talking to NPC will textbox stay open -- use negative number
+                                // to have it be infinite time
     protected int timer;
     protected Textbox textbox = new Textbox("");
     protected int textboxOffsetX = 0;
@@ -52,7 +53,8 @@ public class NPC extends MapEntity {
     public void update(Player player) {
         super.update();
         checkTalkedTo(player);
-        textbox.setLocation((int)getCalibratedXLocation() + textboxOffsetX, (int)getCalibratedYLocation() + textboxOffsetY);
+        textbox.setLocation((int) getCalibratedXLocation() + textboxOffsetX,
+                (int) getCalibratedYLocation() + textboxOffsetY);
     }
 
     public void checkTalkedTo(Player player) {

@@ -45,7 +45,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     public void update() {
         // based on screen state, perform specific actions
         switch (playLevelScreenState) {
-            // if level is "running" update player and map to keep game logic for the platformer level going
+            // if level is "running" update player and map to keep game logic for the
+            // platformer level going
             case RUNNING:
                 player.update();
                 map.update(player);
@@ -63,7 +64,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     }
                 }
                 break;
-            // wait on level lose screen to make a decision (either resets level or sends player back to main menu)
+            // wait on level lose screen to make a decision (either resets level or sends
+            // player back to main menu)
             case LEVEL_LOSE:
                 levelLoseScreen.update();
                 break;
