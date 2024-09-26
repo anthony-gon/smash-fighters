@@ -8,6 +8,7 @@ import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
 import Screens.PracticeRangeScreen;
 import Screens.HowToPlayScreen;
+import Screens.ErrorScreen;
 
 /*
  * Based on the current game state, this class determines which Screen should be shown.
@@ -25,16 +26,15 @@ public class ScreenCoordinator extends Screen {
         return gameState;
     }
 
-    // Other Screens can set the gameState of this class to force it to change the
-    // currentScreen
+    // Other Screens can set the gameState of this class to force it to change the currentScreen
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
 
     @Override
     public void initialize() {
-        // Start game off with Menu Screen
-        gameState = GameState.MENU;
+        // Start game off with Error Screen
+        gameState = GameState.ERROR_SCREEN;
     }
 
     @Override
@@ -42,6 +42,9 @@ public class ScreenCoordinator extends Screen {
         // Check for state change
         if (previousGameState != gameState) {
             switch (gameState) {
+                case ERROR_SCREEN:
+                    currentScreen = new ErrorScreen(this);
+                    break;
                 case MENU:
                     currentScreen = new MenuScreen(this);
                     break;
@@ -79,3 +82,4 @@ public class ScreenCoordinator extends Screen {
         }
     }
 }
+
