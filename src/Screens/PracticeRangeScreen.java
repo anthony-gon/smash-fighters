@@ -2,15 +2,16 @@ package Screens;
 
 import Engine.GraphicsHandler;
 import Engine.Screen;
+import Game.ScreenCoordinator;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import javax.imageio.ImageIO; // Ensure this import is present
 
 public class PracticeRangeScreen extends Screen {
-    private int width;
-    private int height;
+    private ScreenCoordinator screenCoordinator; // Reference to the ScreenCoordinator
+    private int width; // Will be set internally
+    private int height; // Will be set internally
 
     // Platform properties
     private int platformX;
@@ -25,10 +26,13 @@ public class PracticeRangeScreen extends Screen {
     private int dummyHeight;
     private BufferedImage dummySprite; // Placeholder for the dummy sprite
 
-    // Constructor to accept width and height
-    public PracticeRangeScreen(int width, int height) {
-        this.width = width;
-        this.height = height;
+    // Constructor to accept only ScreenCoordinator
+    public PracticeRangeScreen(ScreenCoordinator screenCoordinator) {
+        this.screenCoordinator = screenCoordinator; // Store the reference
+
+        // Set dimensions internally (you can also change these values)
+        this.width = 800;  // Example width
+        this.height = 600; // Example height
 
         // Initialize platform properties
         this.platformX = (int) (width * 0.05);
@@ -48,10 +52,11 @@ public class PracticeRangeScreen extends Screen {
 
     private void loadDummySprite() {
         try {
-            dummySprite = ImageIO.read(new File("C:\\Users\\panag\\.vscode\\smash-fighters\\Resources\\dummy.png")); // Set the correct path to your sprite
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Handle the error (e.g., set a default image or log the error)
+            // Load the resource from the "resources" directory
+            dummySprite = ImageIO.read(new File("resources/dummy.png"));
+        } catch (Exception e) {
+            System.err.println("Failed to load dummy sprite: " + e.getMessage()); // Log the error
+            dummySprite = null; // If there's an error, dummySprite remains null
         }
     }
 
