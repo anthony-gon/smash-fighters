@@ -34,7 +34,7 @@ public class ScreenCoordinator extends Screen {
     @Override
     public void initialize() {
         // Start game off with Error Screen
-        gameState = GameState.ERROR_SCREEN;
+        gameState = GameState.INTRO_SCREEN;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ScreenCoordinator extends Screen {
         // Check for state change
         if (previousGameState != gameState) {
             switch (gameState) {
-                case ERROR_SCREEN:
+                case INTRO_SCREEN:
                     currentScreen = new IntroScreen(this);
                     break;
                 case MENU:
