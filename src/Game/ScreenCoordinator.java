@@ -55,9 +55,7 @@ public class ScreenCoordinator extends Screen {
                     currentScreen = new CreditsScreen(this);
                     break;
                 case PRACTICE_RANGE:
-                    int windowWidth = 800; // Replace with your actual width
-                    int windowHeight = 600; // Replace with your actual height
-                    currentScreen = new PracticeRangeScreen(windowWidth, windowHeight);
+                    currentScreen = new PracticeRangeScreen(this);
                     break;
                 case HOW_TO_PLAY:
                     currentScreen = new HowToPlayScreen(this); // Transition to HowToPlayScreen
