@@ -27,7 +27,7 @@ public class IntroScreen extends Screen {
     private boolean explosionTriggered = false;
     private List<ExplosionParticle> explosionParticles = new ArrayList<>();
     private int explosionTimer = 0;
-    private int explosionDuration = 20; // Duration of each explosion round
+    private int explosionDuration = 25; // Duration of each explosion round
     private int explosionRound = 0; // Tracks which explosion round is occurring
     private int maxRounds = 4; // Number of explosion rounds
     private int explosionsPerRound = 45; // Number of simultaneous explosions per round
@@ -105,11 +105,13 @@ public class IntroScreen extends Screen {
             case 1:
                 return Color.red; // First round - red
             case 2:
-                return Color.orange; // Second round - orange
+                return Color.yellow; // Second round - orange
             case 3:
-                return Color.yellow; // Third round - yellow
+                return Color.orange; // Third round - yellow
+            case 4:
+                return Color.YELLOW; // Fourth round - green
             default:
-                return Color.black; // Initial background color is black
+                return Color.blue; // Initial background color is black
         }
     }
 
