@@ -8,7 +8,7 @@ import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
 import Screens.PracticeRangeScreen;
 import Screens.HowToPlayScreen;
-import Screens.ErrorScreen;
+import Screens.IntroScreen;
 
 /*
  * Based on the current game state, this class determines which Screen should be shown.
@@ -43,7 +43,7 @@ public class ScreenCoordinator extends Screen {
         if (previousGameState != gameState) {
             switch (gameState) {
                 case ERROR_SCREEN:
-                    currentScreen = new ErrorScreen(this);
+                    currentScreen = new IntroScreen(this);
                     break;
                 case MENU:
                     currentScreen = new MenuScreen(this);

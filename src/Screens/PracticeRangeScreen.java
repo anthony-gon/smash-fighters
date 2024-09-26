@@ -2,11 +2,15 @@ package Screens;
 
 import Engine.GraphicsHandler;
 import Engine.Screen;
+import Game.GameState;
 import Game.ScreenCoordinator;
+import Engine.Key;
+import Engine.Keyboard;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.imageio.ImageIO; // Ensure this import is present
+import javax.imageio.ImageIO;
 
 public class PracticeRangeScreen extends Screen {
     private ScreenCoordinator screenCoordinator; // Reference to the ScreenCoordinator
@@ -68,6 +72,11 @@ public class PracticeRangeScreen extends Screen {
     @Override
     public void update() {
         // Logic for updating the practice range, if needed
+
+        // Check if the escape key is pressed to exit the screen
+        if (Keyboard.isKeyDown(Key.ESC)) {
+            screenCoordinator.setGameState(GameState.MENU); // Transition to the main menu
+        }
     }
 
     @Override

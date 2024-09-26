@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ErrorScreen extends Screen {
+public class IntroScreen extends Screen {
     private SpriteFont errorText;
     private ScreenCoordinator screenCoordinator;
     private Random random = new Random();
@@ -32,7 +32,7 @@ public class ErrorScreen extends Screen {
     private int maxRounds = 4; // Number of explosion rounds
     private int explosionsPerRound = 45; // Number of simultaneous explosions per round
 
-    public ErrorScreen(ScreenCoordinator screenCoordinator) {
+    public IntroScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
 
