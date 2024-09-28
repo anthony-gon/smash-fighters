@@ -7,7 +7,6 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-
 public class GraphicsHandler {
     private Graphics2D g;
 
@@ -127,5 +126,24 @@ public class GraphicsHandler {
     public void drawFilledPolygon(int[] xPoints, int[] yPoints, Color starColor) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'drawFilledPolygon'");
+    }
+
+    // New scale method for scaling transformations
+    public void scale(double scaleX, double scaleY, int centerX, int centerY) {
+        // Save the current transform
+        AffineTransform oldTransform = g.getTransform();
+        
+        // Create a new transform for scaling
+        AffineTransform transform = new AffineTransform();
+        // Translate to the center, apply scaling, then translate back
+        transform.translate(centerX, centerY);
+        transform.scale(scaleX, scaleY);
+        transform.translate(-centerX, -centerY);
+
+        // Apply the scaling transform
+        g.transform(transform);
+
+        // Restore the original transform after scaling
+        g.setTransform(oldTransform);
     }
 }

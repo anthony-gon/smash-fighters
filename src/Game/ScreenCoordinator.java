@@ -4,6 +4,8 @@ import Engine.DefaultScreen;
 import Engine.GraphicsHandler;
 import Engine.Screen;
 import Screens.CreditsScreen;
+import Screens.GameNameScreen;
+import Screens.GroupNameScreen;
 import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
 import Screens.PracticeRangeScreen;
@@ -44,6 +46,12 @@ public class ScreenCoordinator extends Screen {
             switch (gameState) {
                 case INTRO_SCREEN:
                     currentScreen = new IntroScreen(this);
+                    break;
+                case GROUP_NAME:
+                    currentScreen = new GroupNameScreen(this);
+                    break;
+                case GAME_NAME:
+                    currentScreen = new GameNameScreen(this);
                     break;
                 case MENU:
                     currentScreen = new MenuScreen(this);

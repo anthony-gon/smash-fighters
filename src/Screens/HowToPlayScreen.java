@@ -9,6 +9,12 @@ import SpriteFont.SpriteFont;
 import Engine.Key;
 import Engine.Keyboard;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import java.io.File;
+
 // This class represents the "How to Play" screen
 public class HowToPlayScreen extends Screen {
     private SpriteFont titleText;
@@ -20,6 +26,9 @@ public class HowToPlayScreen extends Screen {
     private SpriteFont lightAttackText;
     private SpriteFont heavyAttackText;
     private ScreenCoordinator screenCoordinator;
+
+    // Sound properties
+    private Clip backgroundMusicClip;
 
     public HowToPlayScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -63,12 +72,17 @@ public class HowToPlayScreen extends Screen {
         
         heavyAttackText.setOutlineColor(Color.white);
         heavyAttackText.setOutlineThickness(2);
+
+        // Load and play background music
+        loadBackgroundMusic();
+        playBackgroundMusic();
     }
 
     @Override
     public void update() {
         // Check if the ESC key is pressed to exit back to the Menu screen
         if (Keyboard.isKeyDown(Key.ESC)) {
+            stopBackgroundMusic();
             screenCoordinator.setGameState(GameState.MENU);
         }
     }
@@ -91,5 +105,39 @@ public class HowToPlayScreen extends Screen {
 
         // Draw the "Press ESC to exit" message
         exitText.draw(graphicsHandler);
+    }
+
+    // Play the background music
+    private void playBackgroundMusic() {
+        if (backgroundMusicClip != null) {
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the background music
+            backgroundMusicClip.start();
+        }
+    }
+
+    // Stop the background music
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
+    }
+
+    // Load the background music
+    private void loadBackgroundMusic() {
+        try {
+            // Use direct file path to ensure the sound file is found
+            File soundFile = new File("Resources/HowToPlayMusic.wav"); // Update the path if necessary
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+
+            // Optionally set volume to maximum for clarity
+            FloatControl volumeControl = (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeControl.setValue(volumeControl.getMaximum()); // Set to maximum volume
+
+            System.out.println("Background music loaded successfully."); // Debugging output
+        } catch (Exception e) {
+            System.err.println("Error loading background music: " + e.getMessage());
+        }
     }
 }

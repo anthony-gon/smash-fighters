@@ -7,11 +7,15 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.awt.*;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-// This is the class for the main menu screen
 public class MenuScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
     protected int currentMenuItemHovered = 0; // Current menu item being "hovered" over
@@ -36,6 +40,9 @@ public class MenuScreen extends Screen {
     protected int maxTitleSize = 50;
     protected int titleSizeChangeDelay = 0; // Delay counter for size change
     protected int titleSizeChangeDelayMax = 5; // Max delay before size change
+
+    // Sound properties for background music
+    protected Clip musicClip;
 
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -73,6 +80,9 @@ public class MenuScreen extends Screen {
         keyPressTimer = 0;
         menuItemSelected = -1;
         keyLocker.lockKey(Key.SPACE);
+
+        // Load and play background music using the direct path
+        playBackgroundMusic();
     }
 
     public void update() {
@@ -108,6 +118,7 @@ public class MenuScreen extends Screen {
         }
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
             menuItemSelected = currentMenuItemHovered;
+            stopBackgroundMusic(); // Stop the music before transitioning
             if (menuItemSelected == 0) {
                 screenCoordinator.setGameState(GameState.LEVEL);
             } else if (menuItemSelected == 1) { // If Practice Range is selected
@@ -170,5 +181,43 @@ public class MenuScreen extends Screen {
         }
         // Draw the pointer
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+    }
+
+    // Method to load and play background music
+    private void playBackgroundMusic() {
+        try {
+            // Use a direct file path for testing
+            String filePath = "Resources/MenuMusic.wav"; // Replace with the correct relative or absolute path
+            File soundFile = new File(filePath);
+
+            if (!soundFile.exists()) {
+                System.err.println("Sound file not found at path: " + soundFile.getAbsolutePath());
+                return;
+            }
+
+            // Load audio input stream
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            musicClip = AudioSystem.getClip();
+            musicClip.open(audioInputStream);
+
+            // Optionally set the volume to a desired level
+            FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeControl.setValue(volumeControl.getMaximum()); // Max volume
+
+            // Play music in a loop
+            musicClip.loop(Clip.LOOP_CONTINUOUSLY);
+            System.out.println("Music clip started? " + musicClip.isRunning());
+        } catch (Exception e) {
+            System.err.println("Error loading or playing background music: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Method to stop the background music
+    private void stopBackgroundMusic() {
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop();
+            musicClip.close();
+        }
     }
 }

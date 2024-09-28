@@ -8,7 +8,11 @@ import SpriteFont.SpriteFont;
 import Engine.Key;
 import Engine.Keyboard;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,6 +26,7 @@ public class IntroScreen extends Screen {
     private int glitchTimer = 0;
     private int glitchInterval = 5; // How often the glitch effect updates
     private int glitchDuration = 3; // How long a glitch effect lasts
+    private boolean errorSoundPlaying = false; // Track if error sound is currently playing
 
     // Explosion properties
     private boolean explosionTriggered = false;
@@ -30,7 +35,17 @@ public class IntroScreen extends Screen {
     private int explosionDuration = 25; // Duration of each explosion round
     private int explosionRound = 0; // Tracks which explosion round is occurring
     private int maxRounds = 4; // Number of explosion rounds
-    private int explosionsPerRound = 45; // Number of simultaneous explosions per round
+    private int explosionsPerRound = 100; // Number of simultaneous explosions per round
+
+    // Fade properties for transitioning
+    private int fadeAlpha = 0; // Opacity for fade effect
+    private int fadeSpeed = 5; // Speed of fade effect
+    private boolean isFadingOut = false;
+
+    // Sound properties
+    private Clip explosionClip;
+    private Clip errorSoundClip;
+    private Clip backgroundMusicClip;
 
     public IntroScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -42,6 +57,14 @@ public class IntroScreen extends Screen {
         errorText = new SpriteFont("ERROR", 350, 300, "fibberish", 50, Color.red);
         errorText.setOutlineColor(Color.black);
         errorText.setOutlineThickness(3);
+
+        // Load the sounds
+        loadExplosionSound();
+        loadErrorSound();
+        loadBackgroundMusic();
+
+        // Play background music
+        playBackgroundMusic();
     }
 
     @Override
@@ -52,9 +75,15 @@ public class IntroScreen extends Screen {
             glitchErrorText();
         }
 
+        // Play error sound while "ERROR" text is on the screen
+        if (!explosionTriggered && !errorSoundPlaying) {
+            playErrorSound();
+        }
+
         // If SPACE is pressed, trigger the explosion sequence
         if (Keyboard.isKeyDown(Key.SPACE) && !explosionTriggered) {
             triggerExplosions();
+            stopErrorSound(); // Stop the error sound once explosions begin
         }
 
         // Update explosion animation if triggered
@@ -73,9 +102,21 @@ public class IntroScreen extends Screen {
                 if (explosionRound < maxRounds) {
                     triggerExplosions();
                 } else {
-                    // If all rounds are over, transition to the Menu screen
-                    screenCoordinator.setGameState(GameState.MENU);
+                    // Transition to group name screen
+                    isFadingOut = true;
                 }
+            }
+        }
+
+        // Fade-out effect to transition to GroupNameScreen
+        if (isFadingOut) {
+            fadeAlpha = Math.min(fadeAlpha + fadeSpeed, 255);
+            if (fadeAlpha >= 255) {
+                // Once fade out is complete, switch to the GroupNameScreen
+                stopBackgroundMusic();
+                screenCoordinator.setGameState(GameState.GROUP_NAME);
+                isFadingOut = false;
+                fadeAlpha = 0;
             }
         }
     }
@@ -84,7 +125,7 @@ public class IntroScreen extends Screen {
     public void draw(GraphicsHandler graphicsHandler) {
         // Set background color based on the current round
         Color backgroundColor = getBackgroundColorForRound(explosionRound);
-        graphicsHandler.drawFilledRectangle(0, 0, 800, 600, backgroundColor); // Assuming 800x600 screen size
+        graphicsHandler.drawFilledRectangle(0, 0, 800, 600, backgroundColor);
 
         // Draw the "ERROR" text on the screen if explosion hasn't started
         if (!explosionTriggered) {
@@ -97,6 +138,11 @@ public class IntroScreen extends Screen {
                 particle.draw(graphicsHandler);
             }
         }
+
+        // Draw the fade-out effect
+        if (isFadingOut) {
+            graphicsHandler.drawFilledRectangle(0, 0, 800, 600, new Color(0, 0, 0, fadeAlpha));
+        }
     }
 
     // Get the background color based on the current round
@@ -105,13 +151,11 @@ public class IntroScreen extends Screen {
             case 1:
                 return Color.red; // First round - red
             case 2:
-                return Color.yellow; // Second round - orange
+                return Color.yellow; // Second round - yellow
             case 3:
-                return Color.orange; // Third round - yellow
-            case 4:
-                return Color.YELLOW; // Fourth round - green
+                return Color.orange; // Third round - orange
             default:
-                return Color.blue; // Initial background color is black
+                return Color.blue; // Initial background color is blue
         }
     }
 
@@ -122,9 +166,11 @@ public class IntroScreen extends Screen {
         // Clear the previous explosion particles for the new round
         explosionParticles.clear();
 
-        // Increase the number and size of particles with each explosion
         int numParticles = 200; // Consistent large number of particles per explosion
         double sizeMultiplier = 3; // Larger size of particles
+
+        // Play explosion sound
+        playExplosionSound();
 
         // Create multiple explosions happening at random positions on the screen
         for (int i = 0; i < explosionsPerRound; i++) {
@@ -137,6 +183,82 @@ public class IntroScreen extends Screen {
                 double speed = 2 + random.nextDouble() * 5; // Random speed for a big spread
                 explosionParticles.add(new ExplosionParticle(explosionX, explosionY, angle, speed, sizeMultiplier));
             }
+        }
+    }
+
+    // Play the explosion sound
+    private void playExplosionSound() {
+        if (explosionClip != null) {
+            explosionClip.setFramePosition(0); // Rewind the clip to the start
+            explosionClip.start();
+        }
+    }
+
+    // Play the error sound and loop it while the error is on the screen
+    private void playErrorSound() {
+        if (errorSoundClip != null) {
+            errorSoundClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the error sound continuously
+            errorSoundClip.start();
+            errorSoundPlaying = true;
+        }
+    }
+
+    // Stop the error sound
+    private void stopErrorSound() {
+        if (errorSoundClip != null && errorSoundClip.isRunning()) {
+            errorSoundClip.stop();
+            errorSoundPlaying = false;
+        }
+    }
+
+    // Play the background music
+    private void playBackgroundMusic() {
+        if (backgroundMusicClip != null) {
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the background music
+            backgroundMusicClip.start();
+        }
+    }
+
+    // Stop the background music
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
+    }
+
+    // Load the explosion sound
+    private void loadExplosionSound() {
+        try {
+            File soundFile = new File("Resources/MediumExplosion.wav"); // Update the path
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            explosionClip = AudioSystem.getClip();
+            explosionClip.open(audioInputStream);
+        } catch (Exception e) {
+            System.err.println("Error loading explosion sound: " + e.getMessage());
+        }
+    }
+
+    // Load the error sound
+    private void loadErrorSound() {
+        try {
+            File soundFile = new File("Resources/Error.wav"); // Update the path
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            errorSoundClip = AudioSystem.getClip();
+            errorSoundClip.open(audioInputStream);
+        } catch (Exception e) {
+            System.err.println("Error loading error sound: " + e.getMessage());
+        }
+    }
+
+    // Load the background music
+    private void loadBackgroundMusic() {
+        try {
+            File soundFile = new File("Resources/BackgroundMusic.wav"); // Update the path
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+        } catch (Exception e) {
+            System.err.println("Error loading background music: " + e.getMessage());
         }
     }
 
@@ -191,4 +313,4 @@ public class IntroScreen extends Screen {
             errorText.setFontSize(50 + random.nextInt(10) - 5); // Slight size change between -5 and +5
         }
     }
-} 
+}
