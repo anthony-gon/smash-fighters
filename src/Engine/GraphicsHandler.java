@@ -1,7 +1,6 @@
 package Engine;
 
 import GameObject.ImageEffect;
-
 import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -18,14 +17,17 @@ public class GraphicsHandler {
         this.g = g;
     }
 
+    // Draws image at the specified (x, y) position without scaling
     public void drawImage(BufferedImage image, int x, int y) {
         g.drawImage(image, x, y, null);
     }
 
+    // Draws image at the specified (x, y) position with width and height (scaling)
     public void drawImage(BufferedImage image, int x, int y, int width, int height) {
         g.drawImage(image, x, y, width, height, null);
     }
 
+    // Draws image with various image effects like flipping horizontally or vertically
     public void drawImage(BufferedImage image, int x, int y, int width, int height, ImageEffect imageEffect) {
         switch (imageEffect) {
             case NONE:
@@ -43,99 +45,98 @@ public class GraphicsHandler {
         }
     }
 
+    // Draws an outlined rectangle
     public void drawRectangle(int x, int y, int width, int height, Color color) {
         Color oldColor = g.getColor();
-
         g.setColor(color);
         g.drawRect(x, y, width, height);
-
         g.setColor(oldColor);
     }
 
+    // Draws an outlined rectangle with a specified border thickness
     public void drawRectangle(int x, int y, int width, int height, Color color, int borderThickness) {
         Stroke oldStroke = g.getStroke();
         Color oldColor = g.getColor();
-
         g.setStroke(new BasicStroke(borderThickness));
         g.setColor(color);
         g.drawRect(x, y, width, height);
-
         g.setStroke(oldStroke);
         g.setColor(oldColor);
     }
 
+    // Draws a filled rectangle with the specified color
     public void drawFilledRectangle(int x, int y, int width, int height, Color color) {
         Color oldColor = g.getColor();
-
         g.setColor(color);
         g.fillRect(x, y, width, height);
-
         g.setColor(oldColor);
     }
 
+    // Draws a filled rectangle with a border
     public void drawFilledRectangleWithBorder(int x, int y, int width, int height, Color fillColor, Color borderColor, int borderThickness) {
         drawFilledRectangle(x, y, width, height, fillColor);
         drawRectangle(x, y, width, height, borderColor, borderThickness);
     }
 
+    // Draws a string with the specified font and color
     public void drawString(String text, int x, int y, Font font, Color color) {
         Font oldFont = g.getFont();
         Color oldColor = g.getColor();
-
         g.setFont(font);
         g.setColor(color);
         g.drawString(text, x, y);
-
         g.setFont(oldFont);
         g.setColor(oldColor);
     }
 
-    // https://stackoverflow.com/a/35222059 and https://stackoverflow.com/a/31831120
+    // Draws a string with an outline
     public void drawStringWithOutline(String text, int x, int y, Font font, Color textColor, Color outlineColor, float outlineThickness) {
-        // remember original settings
+        // Remember original settings
         Color originalColor = g.getColor();
         Stroke originalStroke = g.getStroke();
         RenderingHints originalHints = g.getRenderingHints();
         g.setStroke(new BasicStroke(outlineThickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        // create a glyph vector from your text
+        // Create a glyph vector from the text
         GlyphVector glyphVector = font.createGlyphVector(g.getFontRenderContext(), text);
 
-        // get the shape object
+        // Get the shape object
         Shape textShape = glyphVector.getOutline();
         AffineTransform at = new AffineTransform();
         at.setToTranslation(Math.round(x), Math.round(y));
         textShape = at.createTransformedShape(textShape);
 
-        // activate anti aliasing for text rendering (if you want it to look nice)
+        // Activate anti-aliasing for text rendering (for better quality)
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
+        // Draw the outline
         g.setColor(outlineColor);
-        g.draw(textShape); // draw outline
+        g.draw(textShape);
 
+        // Fill the text shape
         g.setColor(textColor);
-        g.fill(textShape); // fill the shape
+        g.fill(textShape);
 
-        // reset to original settings after painting
+        // Reset to original settings
         g.setColor(originalColor);
         g.setStroke(originalStroke);
         g.setRenderingHints(originalHints);
     }
 
-    public void drawFilledPolygon(int[] xPoints, int[] yPoints, Color starColor) {
+    // Draws a filled polygon based on the specified x and y points and a color
+    public void drawFilledPolygon(int[] xPoints, int[] yPoints, Color color) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'drawFilledPolygon'");
     }
 
-    // New scale method for scaling transformations
+    // Scales the graphics context around a center point
     public void scale(double scaleX, double scaleY, int centerX, int centerY) {
         // Save the current transform
         AffineTransform oldTransform = g.getTransform();
-        
+
         // Create a new transform for scaling
         AffineTransform transform = new AffineTransform();
-        // Translate to the center, apply scaling, then translate back
         transform.translate(centerX, centerY);
         transform.scale(scaleX, scaleY);
         transform.translate(-centerX, -centerY);
