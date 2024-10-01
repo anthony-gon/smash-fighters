@@ -11,9 +11,10 @@ import Screens.PlayLevelScreen;
 import Screens.PracticeRangeScreen;
 import Screens.HowToPlayScreen;
 import Screens.IntroScreen;
+import Screens.MapSelectScreen;
+import Screens.CharacterScreen;
 
-/*
- * Based on the current game state, this class determines which Screen should be shown.
+ /* Based on the current game state, this class determines which Screen should be shown.
  * There can only be one "currentScreen", although screens can have "nested" screens.
  */
 public class ScreenCoordinator extends Screen {
@@ -56,6 +57,12 @@ public class ScreenCoordinator extends Screen {
                 case MENU:
                     currentScreen = new MenuScreen(this);
                     break;
+                case MAP_SELECT:
+                    currentScreen = new MapSelectScreen(this);
+                    break;
+                case CHARACTER:
+                    currentScreen = new CharacterScreen(this);
+                    break;  
                 case LEVEL:
                     currentScreen = new PlayLevelScreen(this);
                     break;
@@ -68,6 +75,7 @@ public class ScreenCoordinator extends Screen {
                 case HOW_TO_PLAY:
                     currentScreen = new HowToPlayScreen(this); // Transition to HowToPlayScreen
                     break;
+                
             }
             // Initialize the new screen after changing it
             currentScreen.initialize();
@@ -88,4 +96,3 @@ public class ScreenCoordinator extends Screen {
         }
     }
 }
-

@@ -50,10 +50,10 @@ public class CreditsScreen extends Screen {
         // Create credits text lines
         creditsTexts.add(new SpriteFont("Credits", 250, scrollPositionY, "fibberish", 30, Color.white));
         creditsTexts.add(new SpriteFont("Created by The MJ's of Game Design", 150, scrollPositionY + 60, "fibberish", 20, Color.white));
-        creditsTexts.add(new SpriteFont("Sam Joor - Lead Goob", 200, scrollPositionY + 300, "fibberish", 20, Color.white));
-        creditsTexts.add(new SpriteFont("Ben Delton - big = better", 200, scrollPositionY + 600, "fibberish", 20, Color.white));
-        creditsTexts.add(new SpriteFont("Anthony Gonzalez - Hopefully I spelled that right am rly tired ", 200, scrollPositionY + 900, "fibberish", 20, Color.white));
-        creditsTexts.add(new SpriteFont("Hayden I dont know your last name sorry ", 200, scrollPositionY + 1200, "fibberish", 20, Color.white));
+        creditsTexts.add(new SpriteFont("Sam Joor - HELP ME", 200, scrollPositionY + 300, "fibberish", 20, Color.white));
+        creditsTexts.add(new SpriteFont("Ben Delton - Kaboom", 200, scrollPositionY + 600, "fibberish", 20, Color.white));
+        creditsTexts.add(new SpriteFont("Anthony Gonzalez - Kachow ", 200, scrollPositionY + 900, "fibberish", 20, Color.white));
+        creditsTexts.add(new SpriteFont("Hayden I dont know your last name sorry :-) ", 200, scrollPositionY + 1200, "fibberish", 20, Color.white));
         creditsTexts.add(new SpriteFont("Mario I dont know last name mb ", 200, scrollPositionY + 1500, "fibberish", 20, Color.white));
         // Add more credits as needed...
 

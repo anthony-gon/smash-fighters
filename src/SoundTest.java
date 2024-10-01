@@ -17,7 +17,7 @@ public class SoundTest {
         try {
             // Directly access the .wav file using a relative or absolute path
             // Make sure to replace this path with the actual path of your explosion.wav file
-            String filePath = "Resources/MenuMusic.wav"; // Example relative path, update accordingly
+            String filePath = "Resources/Credits.wav"; // Example relative path, update accordingly
             File soundFile = new File(filePath);
 
             // Check if the file exists

@@ -120,7 +120,7 @@ public class MenuScreen extends Screen {
             menuItemSelected = currentMenuItemHovered;
             stopBackgroundMusic(); // Stop the music before transitioning
             if (menuItemSelected == 0) {
-                screenCoordinator.setGameState(GameState.LEVEL);
+                screenCoordinator.setGameState(GameState.MAP_SELECT);
             } else if (menuItemSelected == 1) { // If Practice Range is selected
                 screenCoordinator.setGameState(GameState.PRACTICE_RANGE);
             } else if (menuItemSelected == 2) { // If How to Play is selected

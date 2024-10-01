@@ -69,6 +69,14 @@ public class IntroScreen extends Screen {
 
     @Override
     public void update() {
+        // Check if the F key is pressed to skip to the menu
+        if (Keyboard.isKeyDown(Key.F)) {
+            stopErrorSound(); // Stop any ongoing sounds
+            stopBackgroundMusic(); // Stop background music
+            screenCoordinator.setGameState(GameState.MENU); // Transition to the menu screen
+            return; // Return to prevent further execution of this method
+        }
+
         // Glitch effect update
         glitchTimer++;
         if (glitchTimer % glitchInterval == 0) {
@@ -314,3 +322,4 @@ public class IntroScreen extends Screen {
         }
     }
 }
+
