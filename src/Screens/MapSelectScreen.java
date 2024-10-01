@@ -27,7 +27,7 @@ public class MapSelectScreen extends Screen {
     @Override
     public void initialize() {
         // Initialize the map select buttons
-        map1 = new SpriteFont("MAP 1", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+        map1 = new SpriteFont("ToadsMap", 300, 200, "fibberish", 30, new Color(49, 207, 240));
         map1.setOutlineColor(Color.black);
         map1.setOutlineThickness(3);
 
