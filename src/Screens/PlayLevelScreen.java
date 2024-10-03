@@ -5,19 +5,18 @@ import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import Engine.Screen;
+import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
-import Maps.TestMap;
 import Maps.Map2; // Import your additional map class
+import Maps.TestMap;
 import Players.Knight;
 import SpriteFont.SpriteFont;
-import Utils.Point;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
-import Game.GameState;
 
 // This class is for when the platformer game is actually being played
 public class PlayLevelScreen extends Screen implements PlayerListener {
