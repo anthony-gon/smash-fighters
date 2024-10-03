@@ -14,9 +14,7 @@ import Screens.IntroScreen;
 import Screens.MapSelectScreen;
 import Screens.CharacterScreen;
 
- /* Based on the current game state, this class determines which Screen should be shown.
- * There can only be one "currentScreen", although screens can have "nested" screens.
- */
+// Based on the current game state, this class determines which Screen should be shown.
 public class ScreenCoordinator extends Screen {
     // Currently shown Screen
     protected Screen currentScreen = new DefaultScreen();
@@ -25,13 +23,26 @@ public class ScreenCoordinator extends Screen {
     protected GameState gameState;
     protected GameState previousGameState;
 
+    // Store the selected map name
+    private String selectedMapName;
+
     public GameState getGameState() {
         return gameState;
     }
 
-    // Other Screens can set the gameState of this class to force it to change the currentScreen
+    // Method to set the game state
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    // Method to set the selected map name
+    public void setSelectedMap(String mapName) {
+        this.selectedMapName = mapName;
+    }
+
+    // Method to get the selected map name
+    public String getSelectedMap() {
+        return this.selectedMapName;
     }
 
     @Override
@@ -73,9 +84,8 @@ public class ScreenCoordinator extends Screen {
                     currentScreen = new PracticeRangeScreen(this);
                     break;
                 case HOW_TO_PLAY:
-                    currentScreen = new HowToPlayScreen(this); // Transition to HowToPlayScreen
+                    currentScreen = new HowToPlayScreen(this);
                     break;
-                
             }
             // Initialize the new screen after changing it
             currentScreen.initialize();

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class Map2 extends Map {
 
     public Map2() {
-        super("test_map.txt", new CommonTileset());
+        super("map2.txt", new CommonTileset());
         this.playerStartPosition = getMapTile(2, 11).getLocation();
     }
 

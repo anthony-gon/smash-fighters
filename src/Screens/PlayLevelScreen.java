@@ -5,18 +5,19 @@ import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import Engine.Screen;
-import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
 import Maps.TestMap;
+import Maps.Map2; // Import your additional map class
 import Players.Knight;
 import SpriteFont.SpriteFont;
 import Utils.Point;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import Game.GameState;
 
 // This class is for when the platformer game is actually being played
 public class PlayLevelScreen extends Screen implements PlayerListener {
@@ -44,10 +45,19 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     }
 
     public void initialize() {
-        // define/setup map
-        this.map = new TestMap();
+        // Get the selected map name from the ScreenCoordinator
+        String selectedMapName = screenCoordinator.getSelectedMap();
 
-        // setup player
+        // Initialize map based on selected map name
+        if (selectedMapName.equals("ToadsMap")) {
+            this.map = new TestMap(); // Assuming TestMap corresponds to "ToadsMap"
+        } else if (selectedMapName.equals("MAP 2")) {
+            this.map = new Map2(); // Replace with actual class for "MAP 2"
+        } else {
+            this.map = new TestMap(); // Default to TestMap if no valid map is found
+        }
+
+        // Setup player
         this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         this.player.setMap(map);
         this.player.addListener(this);
@@ -82,7 +92,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             keyLocker.unlockKey(Key.ESC);
         }
 
-        // based on screen state, perform specific actions
+        // Based on screen state, perform specific actions
         switch (playLevelScreenState) {
             case RUNNING:
                 player.update();
@@ -157,7 +167,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
-        // based on screen state, draw appropriate graphics
+        // Based on screen state, draw appropriate graphics
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(graphicsHandler);

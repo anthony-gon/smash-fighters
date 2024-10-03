@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ToadsMap extends Map {
 
     public ToadsMap() {
-        super("test_map.txt", new CommonTileset());
+        super("toadsmap.txt", new CommonTileset());
         this.playerStartPosition = getMapTile(2, 11).getLocation();
     }
 
