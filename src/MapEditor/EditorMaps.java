@@ -5,6 +5,7 @@ import Maps.TestMap;
 import Maps.TitleScreenMap;
 import Maps.ToadsMap;
 import Maps.Map2;
+import Maps.PracticeRangeMap;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ public class EditorMaps {
             add("TitleScreen");
             add("ToadsMap");
             add("Map2");
+            add("PracticeRangeMap");
         }};
     }
 
@@ -28,6 +30,8 @@ public class EditorMaps {
                 return new ToadsMap();
             case "Map2":
                 return new Map2();
+            case "PracticeRangeMap":
+                return new PracticeRangeMap();
             default:
                 throw new RuntimeException("Unrecognized map name");
         }
