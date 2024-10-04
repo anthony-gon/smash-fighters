@@ -81,6 +81,7 @@ public class MapSelectScreen extends Screen {
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
             // When a map is selected, set the selected map in ScreenCoordinator
             String selectedMapName = mapItems.get(currentMapItemHovered).getText(); // Get the map name text
+            System.out.println("Selected Map: " + selectedMapName); // Debug
             screenCoordinator.setSelectedMap(selectedMapName);
 
             // Transition to the character select screen
