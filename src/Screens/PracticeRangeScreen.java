@@ -35,7 +35,7 @@ public class PracticeRangeScreen extends Screen {
         this.screenCoordinator = screenCoordinator; // Store the reference
 
         // Set dimensions internally (you can also change these values)
-        this.width = 800;  // Example width
+        this.width = 800; // Example width
         this.height = 600; // Example height
 
         // Initialize platform properties

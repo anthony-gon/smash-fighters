@@ -19,6 +19,8 @@ public abstract class Player extends GameObject {
     protected float jumpDegrade = 0;
     protected float terminalVelocityY = 0;
     protected float momentumYIncrease = 0;
+    protected int playerHealth = 100;
+    long lastDamage = System.currentTimeMillis();
 
     // values used to handle player movement
     protected float jumpForce = 0;
@@ -56,6 +58,15 @@ public abstract class Player extends GameObject {
         playerState = PlayerState.STANDING;
         previousPlayerState = playerState;
         levelState = LevelState.RUNNING;
+    }
+
+    public int getPlayerHealth() {
+        return this.playerHealth;
+    }
+
+    public void damagePlayer(int damage) {
+        this.playerHealth -= damage;
+
     }
 
     public void update() {
@@ -203,7 +214,7 @@ public abstract class Player extends GameObject {
         if (Keyboard.isKeyDown(JUMP_KEY) && !keyLocker.isKeyLocked(JUMP_KEY)) {
             keyLocker.lockKey(JUMP_KEY);
             playerState = PlayerState.JUMPING;
-        } 
+        }
     }
 
     // player JUMPING state logic
@@ -339,7 +350,17 @@ public abstract class Player extends GameObject {
         if (!isInvincible) {
             // if map entity is an enemy, kill player on touch
             if (mapEntity instanceof Enemy) {
-                levelState = LevelState.PLAYER_DEAD;
+                if (System.currentTimeMillis() - lastDamage >= 300) {
+                    damagePlayer(10);
+                    this.x -= 100;
+                    this.y -= 15;
+                    lastDamage = System.currentTimeMillis();
+                    if (getPlayerHealth() == 0) {
+                        System.out.println("Player Dead");
+                        levelState = LevelState.PLAYER_DEAD;
+                        this.playerHealth = 100;
+                    }
+                }
             }
         }
     }
