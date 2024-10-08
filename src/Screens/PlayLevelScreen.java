@@ -112,7 +112,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 player.update();
                 map.update(player);
                 player2.update();
-                map.update(player2);
+                map.update2(player2);
                 break;
 
             case LEVEL_COMPLETED:

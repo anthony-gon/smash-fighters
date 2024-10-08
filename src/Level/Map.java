@@ -354,7 +354,7 @@ public abstract class Map {
         camera.update(player);
     }
 
-    public void update(Player2 player2) {
+    public void update2(Player2 player2) {
         if (adjustCamera) {
             adjustMovementY(player2);
             adjustMovementX(player2);
