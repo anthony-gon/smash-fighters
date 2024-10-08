@@ -35,6 +35,10 @@ public class EnhancedMapTile extends MapTile {
         super.update();
     }
 
+    public void update(Player2 player2) {
+        super.update();
+    }
+
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
         super.draw(graphicsHandler);

@@ -8,6 +8,7 @@ import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
 import Level.NPC;
 import Level.Player;
+import Level.Player2;
 import Utils.Point;
 
 import java.util.HashMap;
@@ -33,6 +34,17 @@ public class Walrus extends NPC {
         }
 
         super.update(player);
+    }
+
+    public void update(Player2 player2) {
+        // while npc is being talked to, it raises its tail up (in excitement?)
+        if (talkedTo) {
+            currentAnimationName = "TAIL_UP";
+        } else {
+            currentAnimationName = "TAIL_DOWN";
+        }
+
+        super.update(player2);
     }
 
     @Override

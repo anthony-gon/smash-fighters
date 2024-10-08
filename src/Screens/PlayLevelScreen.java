@@ -8,10 +8,12 @@ import Engine.Screen;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
+import Level.Player2;
 import Level.PlayerListener;
 import Maps.TestMap;
 import Maps.Map2; // Import your additional map class
 import Players.Knight;
+import Players.Knight2;
 import SpriteFont.SpriteFont;
 import Utils.Point;
 import java.awt.Color;
@@ -24,6 +26,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
+    protected Player2 player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -59,7 +62,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         // Setup player
         this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         this.player.setMap(map);
+        this.player2.setMap(map);
         this.player.addListener(this);
 
         levelClearedScreen = new LevelClearedScreen();
@@ -97,6 +102,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             case RUNNING:
                 player.update();
                 map.update(player);
+                player2.update();
+                map.update(player2);
                 break;
 
             case LEVEL_COMPLETED:
@@ -172,6 +179,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             case RUNNING:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
+                player2.draw(graphicsHandler);
                 break;
             case LEVEL_COMPLETED:
                 levelClearedScreen.draw(graphicsHandler);
