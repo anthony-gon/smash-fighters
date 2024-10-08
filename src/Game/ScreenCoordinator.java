@@ -26,6 +26,9 @@ public class ScreenCoordinator extends Screen {
     // Store the selected map name
     private String selectedMapName;
 
+    // Store the CharacterScreen instance for later use
+    private CharacterScreen characterScreen;
+
     public GameState getGameState() {
         return gameState;
     }
@@ -43,6 +46,11 @@ public class ScreenCoordinator extends Screen {
     // Method to get the selected map name
     public String getSelectedMap() {
         return this.selectedMapName;
+    }
+
+    // Getter for the CharacterScreen
+    public CharacterScreen getCharacterScreen() {
+        return characterScreen;
     }
 
     @Override
@@ -72,7 +80,9 @@ public class ScreenCoordinator extends Screen {
                     currentScreen = new MapSelectScreen(this);
                     break;
                 case CHARACTER:
-                    currentScreen = new CharacterScreen(this);
+                    // Store the CharacterScreen instance when this state is activated
+                    characterScreen = new CharacterScreen(this);
+                    currentScreen = characterScreen;
                     break;  
                 case LEVEL:
                     currentScreen = new PlayLevelScreen(this);

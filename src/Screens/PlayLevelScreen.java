@@ -13,9 +13,9 @@ import Level.PlayerListener;
 import Maps.ToadsMap;
 import Maps.Map2; // Ensure you have Map2 class defined
 import Players.Knight;
+import Players.Mage;
 import SpriteFont.SpriteFont;
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,7 +48,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     public void initialize() {
         // Get the selected map name from the ScreenCoordinator
         String selectedMapName = screenCoordinator.getSelectedMap();
-        System.out.println("Initializing PlayLevelScreen with map: " + selectedMapName); // Debug
+        
+        // Get the selected character from CharacterScreen
+        CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
@@ -57,16 +59,14 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             this.map = new Map2(); // Replace with actual class for "MAP 2"
         }
 
-        // Check if the map is successfully initialized
-        if (map != null) {
-            System.out.println("Map loaded successfully: " + map.getClass().getSimpleName());
-            System.out.println("Player starting position: " + map.getPlayerStartPosition()); // Debug
-        } else {
-            System.err.println("Failed to load map: " + selectedMapName);
+        // Setup player based on the selected character
+        if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
+            this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
+            this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         }
-
-        // Setup player
-        this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        
+        // Ensure the player is correctly set up with the map and listener
         this.player.setMap(map);
         this.player.addListener(this);
 
@@ -242,3 +242,4 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         RUNNING, LEVEL_COMPLETED, LEVEL_LOSE, PAUSED
     }
 }
+

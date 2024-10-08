@@ -20,6 +20,14 @@ public class CharacterScreen extends Screen {
     protected int pointerOffsetY = 7;
     protected KeyLocker keyLocker = new KeyLocker();
 
+    // Enum to represent character selections
+    public enum SelectedCharacter {
+        BRAWLER, SWORDSMAN, GUNNER
+    }
+
+    // Field to store the selected character
+    protected SelectedCharacter selectedCharacter = SelectedCharacter.BRAWLER; // Default to BRAWLER
+
     public CharacterScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -78,7 +86,6 @@ public class CharacterScreen extends Screen {
                 characterItems.get(i).setColor(new Color(49, 207, 240)); // Default color
             }
         }
-        
 
         // Handle selection
         if (Keyboard.isKeyUp(Key.SPACE)) {
@@ -86,6 +93,17 @@ public class CharacterScreen extends Screen {
         }
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
             // When a character is selected, transition to the play level screen
+            switch (currentCharacterItemHovered) {
+                case 0:
+                    selectedCharacter = SelectedCharacter.BRAWLER;
+                    break;
+                case 1:
+                    selectedCharacter = SelectedCharacter.SWORDSMAN;
+                    break;
+                case 2:
+                    selectedCharacter = SelectedCharacter.GUNNER;
+                    break;
+            }
             screenCoordinator.setGameState(GameState.LEVEL);
         }
     }
@@ -96,5 +114,10 @@ public class CharacterScreen extends Screen {
         }
         // Draw the pointer
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+    }
+
+    // Getter to retrieve the selected character
+    public SelectedCharacter getSelectedCharacter() {
+        return selectedCharacter;
     }
 }
