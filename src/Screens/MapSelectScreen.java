@@ -67,7 +67,6 @@ public class MapSelectScreen extends Screen {
         for (int i = 0; i < mapItems.size(); i++) {
             if (i == currentMapItemHovered) {
                 mapItems.get(i).setColor(new Color(255, 215, 0)); // Highlighted color
-                // Fix casting issue by converting float to int
                 pointerLocationX = (int) mapItems.get(i).getX() - pointerOffsetX;
                 pointerLocationY = (int) mapItems.get(i).getY() - pointerOffsetY;
             } else {
@@ -80,7 +79,12 @@ public class MapSelectScreen extends Screen {
             keyLocker.unlockKey(Key.SPACE);
         }
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
-            // When a map is selected, transition to the character select screen
+            // When a map is selected, set the selected map in ScreenCoordinator
+            String selectedMapName = mapItems.get(currentMapItemHovered).getText(); // Get the map name text
+            System.out.println("Selected Map: " + selectedMapName); // Debug
+            screenCoordinator.setSelectedMap(selectedMapName);
+
+            // Transition to the character select screen
             screenCoordinator.setGameState(GameState.CHARACTER);
         }
     }

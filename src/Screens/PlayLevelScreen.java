@@ -9,12 +9,15 @@ import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
+import Level.Player2;
 import Level.PlayerListener;
-import Maps.TestMap;
+import Maps.ToadsMap;
+import Maps.Map2; // Ensure you have Map2 class defined
 import Players.Knight;
+import Players.Knight2;
 import SpriteFont.SpriteFont;
-import Utils.Point;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +26,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
+    protected Player2 player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -43,13 +47,32 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.screenCoordinator = screenCoordinator;
     }
 
+    @Override
     public void initialize() {
-        // define/setup map
-        this.map = new TestMap();
+        // Get the selected map name from the ScreenCoordinator
+        String selectedMapName = screenCoordinator.getSelectedMap();
+        System.out.println("Initializing PlayLevelScreen with map: " + selectedMapName); // Debug
 
-        // setup player
+        // Initialize map based on selected map name
+        if (selectedMapName.equals("ToadsMap")) {
+            this.map = new ToadsMap(); // Assuming ToadsMap corresponds to "ToadsMap"
+        } else if (selectedMapName.equals("MAP 2")) {
+            this.map = new Map2(); // Replace with actual class for "MAP 2"
+        }
+
+        // Check if the map is successfully initialized
+        if (map != null) {
+            System.out.println("Map loaded successfully: " + map.getClass().getSimpleName());
+            System.out.println("Player starting position: " + map.getPlayerStartPosition()); // Debug
+        } else {
+            System.err.println("Failed to load map: " + selectedMapName);
+        }
+
+        // Setup player
         this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         this.player.setMap(map);
+        this.player2.setMap(map);
         this.player.addListener(this);
 
         levelClearedScreen = new LevelClearedScreen();
@@ -66,6 +89,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         keyLocker.lockKey(Key.ESC);
     }
 
+    @Override
     public void update() {
         // Handle pause input with the ESCAPE key
         if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
@@ -82,11 +106,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             keyLocker.unlockKey(Key.ESC);
         }
 
-        // based on screen state, perform specific actions
+        // Based on screen state, perform specific actions
         switch (playLevelScreenState) {
             case RUNNING:
                 player.update();
                 map.update(player);
+                player2.update();
+                map.update(player2);
                 break;
 
             case LEVEL_COMPLETED:
@@ -156,12 +182,14 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
     }
 
+    @Override
     public void draw(GraphicsHandler graphicsHandler) {
-        // based on screen state, draw appropriate graphics
+        // Based on screen state, draw appropriate graphics
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
+                player2.draw(graphicsHandler);
                 break;
             case LEVEL_COMPLETED:
                 levelClearedScreen.draw(graphicsHandler);

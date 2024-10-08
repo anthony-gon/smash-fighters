@@ -6,6 +6,7 @@ import Game.ScreenCoordinator;
 import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
+import Players.Knight;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -87,7 +88,6 @@ public class MenuScreen extends Screen {
 
     public void update() {
         // Update background map (to play tile animations)
-        background.update(null);
 
         // Change menu item "hovered" over
         if (Keyboard.isKeyDown(Key.DOWN) && keyPressTimer == 0) {
