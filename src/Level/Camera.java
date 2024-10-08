@@ -60,6 +60,29 @@ public class Camera extends Rectangle {
         updateMapEntities(player);
     }
 
+    public void update(Player2 player2) {
+        updateMapTiles();
+        updateMapEntities(player2);
+    }
+
+    private void updateMapEntities(Player2 player2) {
+        activeEnemies = loadActiveEnemies();
+        activeEnhancedMapTiles = loadActiveEnhancedMapTiles();
+        activeNPCs = loadActiveNPCs();
+
+        for (Enemy enemy : activeEnemies) {
+            enemy.update(player2);
+        }
+
+        for (EnhancedMapTile enhancedMapTile : activeEnhancedMapTiles) {
+            enhancedMapTile.update(player2);
+        }
+
+        for (NPC npc : activeNPCs) {
+            npc.update(player2);
+        }
+    }
+
     private void updateMapTiles() {
         for (MapTile tile : map.getAnimatedMapTiles()) {
             // update each animated map tile in order to keep animations consistent
