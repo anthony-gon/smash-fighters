@@ -5,21 +5,21 @@ import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import Engine.Screen;
+import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
 import Level.Player2;
 import Level.PlayerListener;
-import Maps.TestMap;
-import Maps.Map2; // Import your additional map class
+import Maps.ToadsMap;
+import Maps.Map2; // Ensure you have Map2 class defined
 import Players.Knight;
 import Players.Knight2;
 import SpriteFont.SpriteFont;
-import Utils.Point;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import Game.GameState;
 
 // This class is for when the platformer game is actually being played
 public class PlayLevelScreen extends Screen implements PlayerListener {
@@ -47,17 +47,25 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.screenCoordinator = screenCoordinator;
     }
 
+    @Override
     public void initialize() {
         // Get the selected map name from the ScreenCoordinator
         String selectedMapName = screenCoordinator.getSelectedMap();
+        System.out.println("Initializing PlayLevelScreen with map: " + selectedMapName); // Debug
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
-            this.map = new TestMap(); // Assuming TestMap corresponds to "ToadsMap"
+            this.map = new ToadsMap(); // Assuming ToadsMap corresponds to "ToadsMap"
         } else if (selectedMapName.equals("MAP 2")) {
             this.map = new Map2(); // Replace with actual class for "MAP 2"
+        }
+
+        // Check if the map is successfully initialized
+        if (map != null) {
+            System.out.println("Map loaded successfully: " + map.getClass().getSimpleName());
+            System.out.println("Player starting position: " + map.getPlayerStartPosition()); // Debug
         } else {
-            this.map = new TestMap(); // Default to TestMap if no valid map is found
+            System.err.println("Failed to load map: " + selectedMapName);
         }
 
         // Setup player
@@ -81,6 +89,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         keyLocker.lockKey(Key.ESC);
     }
 
+    @Override
     public void update() {
         // Handle pause input with the ESCAPE key
         if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
@@ -173,6 +182,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
     }
 
+    @Override
     public void draw(GraphicsHandler graphicsHandler) {
         // Based on screen state, draw appropriate graphics
         switch (playLevelScreenState) {
