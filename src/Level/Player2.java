@@ -208,7 +208,6 @@ public abstract class Player2 extends GameObject {
 
     // player JUMPING state logic
     protected void playerJumping() {
-        keyLocker.unlockKey(JUMP_KEY);
         // if last frame player was on ground and this frame player is still on ground,
         // the jump needs to be setup
         if (previousAirGroundState == AirGroundState.GROUND && airGroundState == AirGroundState.GROUND) {
