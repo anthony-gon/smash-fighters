@@ -11,8 +11,12 @@ import Level.Map;
 import Level.Player;
 import Level.Player2;
 import Level.PlayerListener;
+
+import Level.HealthBar;
+import Maps.TestMap;
 import Maps.ToadsMap;
 import Maps.Map2; // Ensure you have Map2 class defined
+
 import Players.Knight;
 import Players.Knight2;
 import SpriteFont.SpriteFont;
@@ -26,7 +30,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
+
+    protected HealthBar healthBar;
     protected Player2 player2;
+
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -42,7 +49,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected int pausePointerOffsetX = 20;
     protected int pausePointerOffsetY = 5;
     protected KeyLocker keyLocker = new KeyLocker(); // Locker to handle input
-    
+
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -51,7 +58,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     public void initialize() {
         // Get the selected map name from the ScreenCoordinator
         String selectedMapName = screenCoordinator.getSelectedMap();
+
+        this.healthBar = new HealthBar(100, 0, 100, 100);
+        healthBar.loadHealthBars();
+
         System.out.println("Initializing PlayLevelScreen with map: " + selectedMapName); // Debug
+
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
@@ -189,7 +201,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             case RUNNING:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
+
+                healthBar.draw(graphicsHandler, player.getPlayerHealth());
+                System.out.println("player health: " + player.getPlayerHealth());
+
                 player2.draw(graphicsHandler);
+
                 break;
             case LEVEL_COMPLETED:
                 levelClearedScreen.draw(graphicsHandler);
@@ -215,7 +232,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         }
 
         // Draw pointer
-        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
+                new Color(49, 207, 240), Color.black, 2);
     }
 
     public PlayLevelScreenState getPlayLevelScreenState() {
