@@ -9,22 +9,32 @@ import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
+import Level.Player2;
 import Level.PlayerListener;
 import Maps.ToadsMap;
 import Maps.Map2; // Ensure you have Map2 class defined
 import Players.Brawler;
+import Players.Brawler2;
 import Players.Knight;
+import Players.Knight2;
 import Players.Mage;
+import Players.Mage2;
 import SpriteFont.SpriteFont;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.awt.Color;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-// This class is for when the platformer game is actually being played
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
+    protected Player2 player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -35,58 +45,61 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected SpriteFont resumeOption;
     protected SpriteFont exitToMenuOption;
     protected List<SpriteFont> pauseMenuItems;
-    protected int currentPauseMenuItemHovered = 0; // Currently hovered pause option
+    protected int currentPauseMenuItemHovered = 0;
     protected int pausePointerLocationX, pausePointerLocationY;
     protected int pausePointerOffsetX = 20;
     protected int pausePointerOffsetY = 5;
-    protected KeyLocker keyLocker = new KeyLocker(); // Locker to handle input
-    
+    protected KeyLocker keyLocker = new KeyLocker();
+
+    // Music-related properties
+    protected Clip musicClip;
+
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
 
     @Override
-public void initialize() {
-    // Get the selected map name from the ScreenCoordinator
-    String selectedMapName = screenCoordinator.getSelectedMap();
-    
-    // Get the selected character from CharacterScreen
-    CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
+    public void initialize() {
+        // Get the selected map name from the ScreenCoordinator
+        String selectedMapName = screenCoordinator.getSelectedMap();
+        CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
 
-    // Initialize map based on selected map name
-    if (selectedMapName.equals("ToadsMap")) {
-        this.map = new ToadsMap(); // Assuming ToadsMap corresponds to "ToadsMap"
-    } else if (selectedMapName.equals("MAP 2")) {
-        this.map = new Map2(); // Replace with actual class for "MAP 2"
+        // Initialize map based on selected map name
+        if (selectedMapName.equals("ToadsMap")) {
+            this.map = new ToadsMap();
+        } else if (selectedMapName.equals("MAP 2")) {
+            this.map = new Map2();
+        }
+
+        // Setup player and player2 based on the selected character
+        if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
+            this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.BRAWLER) {
+            this.player = new Brawler(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            this.player2 = new Brawler2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
+            this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        }
+        this.player.setMap(map);
+        this.player2.setMap(map);
+        this.player.addListener(this);
+        this.player2.addListener(this);
+
+        levelClearedScreen = new LevelClearedScreen();
+        levelLoseScreen = new LevelLoseScreen(this);
+
+        this.playLevelScreenState = PlayLevelScreenState.RUNNING;
+
+        resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+        exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
+        pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
+        keyLocker.lockKey(Key.ESC);
+
+        // Play the background music when the PlayLevelScreen starts
+        playBackgroundMusic();
     }
-
-    // Setup player based on the selected character
-    if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-        this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-    } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
-        this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-    } else if (selectedCharacter == CharacterScreen.SelectedCharacter.BRAWLER) {
-        // Add this logic to handle Brawler character
-        this.player = new Brawler(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y); // Assuming Brawler class exists
-    }
-
-    // Ensure the player is correctly set up with the map and listener
-    this.player.setMap(map);
-    this.player.addListener(this);
-
-    levelClearedScreen = new LevelClearedScreen();
-    levelLoseScreen = new LevelLoseScreen(this);
-
-    this.playLevelScreenState = PlayLevelScreenState.RUNNING;
-
-    // Initialize pause menu options
-    resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
-    exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
-    pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
-
-    // Lock the ESCAPE key initially to prevent immediate toggling
-    keyLocker.lockKey(Key.ESC);
-}
 
     @Override
     public void update() {
@@ -94,22 +107,24 @@ public void initialize() {
         if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
             if (playLevelScreenState == PlayLevelScreenState.RUNNING) {
                 playLevelScreenState = PlayLevelScreenState.PAUSED;
+                stopBackgroundMusic(); // Stop music when the game is paused
             } else if (playLevelScreenState == PlayLevelScreenState.PAUSED) {
                 playLevelScreenState = PlayLevelScreenState.RUNNING;
+                playBackgroundMusic(); // Resume music when unpaused
             }
-            keyLocker.lockKey(Key.ESC); // Lock key to avoid repeated toggling
+            keyLocker.lockKey(Key.ESC);
         }
 
-        // Unlock ESCAPE key to detect next press
         if (Keyboard.isKeyUp(Key.ESC)) {
             keyLocker.unlockKey(Key.ESC);
         }
 
-        // Based on screen state, perform specific actions
         switch (playLevelScreenState) {
             case RUNNING:
                 player.update();
                 map.update(player);
+                player2.update();
+                map.update2(player2);
                 break;
 
             case LEVEL_COMPLETED:
@@ -126,6 +141,7 @@ public void initialize() {
                 break;
 
             case LEVEL_LOSE:
+                stopBackgroundMusic(); // Stop music when the player dies
                 levelLoseScreen.update();
                 break;
 
@@ -136,7 +152,6 @@ public void initialize() {
     }
 
     private void updatePauseMenu() {
-        // Navigate through pause menu items
         if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
             currentPauseMenuItemHovered++;
             if (currentPauseMenuItemHovered >= pauseMenuItems.size()) {
@@ -151,7 +166,6 @@ public void initialize() {
             keyLocker.lockKey(Key.UP);
         }
 
-        // Unlock keys to allow smooth navigation
         if (Keyboard.isKeyUp(Key.UP)) {
             keyLocker.unlockKey(Key.UP);
         }
@@ -159,33 +173,31 @@ public void initialize() {
             keyLocker.unlockKey(Key.DOWN);
         }
 
-        // Handle selection
         if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
-            if (currentPauseMenuItemHovered == 0) { // Resume selected
+            if (currentPauseMenuItemHovered == 0) {
                 playLevelScreenState = PlayLevelScreenState.RUNNING;
-            } else if (currentPauseMenuItemHovered == 1) { // Exit to menu selected
+                playBackgroundMusic(); // Resume music when unpaused
+            } else if (currentPauseMenuItemHovered == 1) {
                 goBackToMenu();
             }
-            keyLocker.lockKey(Key.SPACE); // Lock space key to prevent double activation
+            keyLocker.lockKey(Key.SPACE);
         }
 
-        // Unlock the space key for new presses
         if (Keyboard.isKeyUp(Key.SPACE)) {
             keyLocker.unlockKey(Key.SPACE);
         }
 
-        // Update pointer position based on hovered item
         pausePointerLocationX = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getX() - pausePointerOffsetX;
         pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
     }
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
-        // Based on screen state, draw appropriate graphics
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
+                player2.draw(graphicsHandler);
                 break;
             case LEVEL_COMPLETED:
                 levelClearedScreen.draw(graphicsHandler);
@@ -194,23 +206,20 @@ public void initialize() {
                 levelLoseScreen.draw(graphicsHandler);
                 break;
             case PAUSED:
-                map.draw(graphicsHandler); // Optionally draw map behind the pause menu
-                player.draw(graphicsHandler); // Optionally draw player behind the pause menu
+                map.draw(graphicsHandler);
+                player.draw(graphicsHandler);
                 drawPauseMenu(graphicsHandler);
                 break;
         }
     }
 
     private void drawPauseMenu(GraphicsHandler graphicsHandler) {
-        // Draw a simple rectangle to represent the pause menu background
         graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
 
-        // Draw pause menu items
         for (SpriteFont menuItem : pauseMenuItems) {
             menuItem.draw(graphicsHandler);
         }
 
-        // Draw pointer
         graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
     }
 
@@ -230,6 +239,7 @@ public void initialize() {
     public void onDeath() {
         if (playLevelScreenState != PlayLevelScreenState.LEVEL_LOSE) {
             playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+            stopBackgroundMusic(); // Stop music when the player dies
         }
     }
 
@@ -238,12 +248,45 @@ public void initialize() {
     }
 
     public void goBackToMenu() {
+        stopBackgroundMusic(); // Stop the music when going back to the menu
         screenCoordinator.setGameState(GameState.MENU);
     }
 
-    // This enum represents the different states this screen can be in
+    // Method to load and play background music
+    private void playBackgroundMusic() {
+        try {
+            String filePath = "Resources/Fighting.wav"; // Path to your background music
+            File soundFile = new File(filePath);
+
+            if (!soundFile.exists()) {
+                System.err.println("Sound file not found at path: " + soundFile.getAbsolutePath());
+                return;
+            }
+
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            musicClip = AudioSystem.getClip();
+            musicClip.open(audioInputStream);
+
+            FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeControl.setValue(volumeControl.getMaximum()); // Set to max volume
+
+            musicClip.loop(Clip.LOOP_CONTINUOUSLY); // Play music in a loop
+            musicClip.start();
+        } catch (Exception e) {
+            System.err.println("Error loading or playing background music: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Method to stop the background music
+    private void stopBackgroundMusic() {
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop();
+            musicClip.close();
+        }
+    }
+
     private enum PlayLevelScreenState {
         RUNNING, LEVEL_COMPLETED, LEVEL_LOSE, PAUSED
     }
 }
-
