@@ -1,95 +1,177 @@
 package Screens;
 
 import Engine.GraphicsHandler;
+import Engine.Key;
+import Engine.KeyLocker;
+import Engine.Keyboard;
 import Engine.Screen;
 import Game.GameState;
 import Game.ScreenCoordinator;
-import Engine.Key;
-import Engine.Keyboard;
-
+import Level.Map;
+import Level.Player;
+import Level.PlayerListener;
+import Maps.PracticeRangeMap; // Ensure you have PracticeRangeMap class defined
+import Players.Knight;
+import SpriteFont.SpriteFont;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
 
-public class PracticeRangeScreen extends Screen {
-    private ScreenCoordinator screenCoordinator; // Reference to the ScreenCoordinator
-    private int width; // Will be set internally
-    private int height; // Will be set internally
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    // Platform properties
-    private int platformX;
-    private int platformY;
-    private int platformWidth;
-    private int platformHeight;
+// This class is for the practice range where players can move around
+public class PracticeRangeScreen extends Screen implements PlayerListener {
+    protected ScreenCoordinator screenCoordinator;
+    protected Map map;
+    protected Player player;
+    protected KeyLocker keyLocker = new KeyLocker(); // Locker to handle input
+    protected PracticeRangeScreenState practiceRangeScreenState;
+    
+    // Pause menu variables
+    protected SpriteFont resumeOption;
+    protected SpriteFont exitToMenuOption;
+    protected List<SpriteFont> pauseMenuItems;
+    protected int currentPauseMenuItemHovered = 0; // Currently hovered pause option
+    protected int pausePointerLocationX, pausePointerLocationY;
+    protected int pausePointerOffsetX = 20;
+    protected int pausePointerOffsetY = 5;
 
-    // Dummy properties
-    private int dummyX;
-    private int dummyY;
-    private int dummyWidth;
-    private int dummyHeight;
-    private BufferedImage dummySprite; // Placeholder for the dummy sprite
-
-    // Constructor to accept only ScreenCoordinator
     public PracticeRangeScreen(ScreenCoordinator screenCoordinator) {
-        this.screenCoordinator = screenCoordinator; // Store the reference
-
-        // Set dimensions internally (you can also change these values)
-        this.width = 800; // Example width
-        this.height = 600; // Example height
-
-        // Initialize platform properties
-        this.platformX = (int) (width * 0.05);
-        this.platformY = (int) (height * (2.0 / 3.0));
-        this.platformWidth = (int) (width * 0.90);
-        this.platformHeight = 20;
-
-        // Initialize dummy properties
-        this.dummyWidth = 30; // Adjust based on your sprite's dimensions
-        this.dummyHeight = 60; // Adjust based on your sprite's dimensions
-        this.dummyX = platformX + platformWidth - dummyWidth - 10;
-        this.dummyY = platformY - dummyHeight; // Align the dummy above the platform
-
-        // Load the sprite
-        loadDummySprite();
-    }
-
-    private void loadDummySprite() {
-        try {
-            // Load the resource from the "resources" directory
-            dummySprite = ImageIO.read(new File("resources/dummy.png"));
-        } catch (Exception e) {
-            System.err.println("Failed to load dummy sprite: " + e.getMessage()); // Log the error
-            dummySprite = null; // If there's an error, dummySprite remains null
-        }
+        this.screenCoordinator = screenCoordinator;
+        this.practiceRangeScreenState = PracticeRangeScreenState.RUNNING; // Start in running state
     }
 
     @Override
     public void initialize() {
-        // Initialization code for the practice range, if needed
+        // Initialize the practice range map
+        this.map = new PracticeRangeMap(); // Ensure this map exists
+        System.out.println("Initializing PracticeRangeScreen with map: " + map.getClass().getSimpleName()); // Debug
+
+        // Setup player
+        this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        this.player.setMap(map);
+        this.player.addListener(this);
+
+        // Initialize pause menu options
+        resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+        exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
+        pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
+        
+        // Lock the ESCAPE key initially to prevent immediate toggling
+        keyLocker.lockKey(Key.ESC);
     }
 
     @Override
     public void update() {
-        // Logic for updating the practice range, if needed
+        // Handle escape key for pausing the game
+        if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
+            if (practiceRangeScreenState == PracticeRangeScreenState.RUNNING) {
+                practiceRangeScreenState = PracticeRangeScreenState.PAUSED;
+            } else if (practiceRangeScreenState == PracticeRangeScreenState.PAUSED) {
+                practiceRangeScreenState = PracticeRangeScreenState.RUNNING;
+            }
+            keyLocker.lockKey(Key.ESC); // Lock key to avoid repeated toggling
+        }
 
-        // Check if the escape key is pressed to exit the screen
-        if (Keyboard.isKeyDown(Key.ESC)) {
-            screenCoordinator.setGameState(GameState.MENU); // Transition to the main menu
+        // Unlock ESCAPE key to detect next press
+        if (Keyboard.isKeyUp(Key.ESC)) {
+            keyLocker.unlockKey(Key.ESC);
+        }
+
+        // Based on screen state, perform specific actions
+        switch (practiceRangeScreenState) {
+            case RUNNING:
+                // Handle player movement inputs
+                player.update(); // Allow the player to move freely in the practice range
+
+                // Update the map
+                map.update(player);
+                break;
+
+            case PAUSED:
+                updatePauseMenu();
+                break;
+        }
+    }
+
+    private void updatePauseMenu() {
+        // Navigate through pause menu items
+        if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
+            currentPauseMenuItemHovered++;
+            if (currentPauseMenuItemHovered >= pauseMenuItems.size()) {
+                currentPauseMenuItemHovered = 0;
+            }
+            keyLocker.lockKey(Key.DOWN);
+        } else if (Keyboard.isKeyDown(Key.UP) && !keyLocker.isKeyLocked(Key.UP)) {
+            currentPauseMenuItemHovered--;
+            if (currentPauseMenuItemHovered < 0) {
+                currentPauseMenuItemHovered = pauseMenuItems.size() - 1;
+            }
+            keyLocker.lockKey(Key.UP);
+        }
+
+        // Unlock keys to allow smooth navigation
+        if (Keyboard.isKeyUp(Key.UP)) {
+            keyLocker.unlockKey(Key.UP);
+        }
+        if (Keyboard.isKeyUp(Key.DOWN)) {
+            keyLocker.unlockKey(Key.DOWN);
+        }
+
+        // Handle selection
+        if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
+            if (currentPauseMenuItemHovered == 0) { // Resume selected
+                practiceRangeScreenState = PracticeRangeScreenState.RUNNING;
+            } else if (currentPauseMenuItemHovered == 1) { // Exit to menu selected
+                goBackToMenu();
+            }
+            keyLocker.lockKey(Key.SPACE); // Lock space key to prevent double activation
+        }
+
+        // Unlock the space key for new presses
+        if (Keyboard.isKeyUp(Key.SPACE)) {
+            keyLocker.unlockKey(Key.SPACE);
         }
     }
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
-        // Fill the screen with a white color
-        graphicsHandler.drawFilledRectangle(0, 0, width, height, Color.WHITE);
+        // Draw the map and player
+        map.draw(graphicsHandler);
+        player.draw(graphicsHandler);
 
-        // Draw the platform
-        graphicsHandler.drawFilledRectangle(platformX, platformY, platformWidth, platformHeight, Color.GRAY);
-
-        // Draw the placeholder for the training dummy (sprite)
-        if (dummySprite != null) {
-            graphicsHandler.drawImage(dummySprite, dummyX, dummyY); // Use a method to draw the image
+        // Draw pause menu if paused
+        if (practiceRangeScreenState == PracticeRangeScreenState.PAUSED) {
+            drawPauseMenu(graphicsHandler);
         }
+    }
+
+    private void drawPauseMenu(GraphicsHandler graphicsHandler) {
+        // Draw a simple rectangle to represent the pause menu background
+        graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
+
+        // Draw pause menu items
+        for (SpriteFont menuItem : pauseMenuItems) {
+            menuItem.draw(graphicsHandler);
+        }
+
+        // Update pointer position based on hovered item
+        pausePointerLocationX = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getX() - pausePointerOffsetX;
+        pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
+
+        // Draw pointer
+        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+    }
+
+    @Override
+    public void onDeath() {
+    }
+
+    public void goBackToMenu() {
+        screenCoordinator.setGameState(GameState.MENU);
+    }
+
+    private enum PracticeRangeScreenState {
+        RUNNING, PAUSED
     }
 }

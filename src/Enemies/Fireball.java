@@ -8,6 +8,7 @@ import Level.Enemy;
 import Level.MapEntity;
 import Level.MapEntityStatus;
 import Level.Player;
+import Level.Player2;
 import Utils.Direction;
 import Utils.Point;
 
@@ -45,6 +46,20 @@ public class Fireball extends Enemy {
     }
 
     @Override
+    public void update(Player2 player2) {
+        // if timer is up, set map entity status to REMOVED
+        // the camera class will see this next frame and remove it permanently from the map
+        if (existenceFrames == 0) {
+            this.mapEntityStatus = MapEntityStatus.REMOVED;
+        } else {
+            // move fireball forward
+            moveXHandleCollision(movementSpeed);
+            super.update(player2);
+        }
+        existenceFrames--;
+    }
+
+    @Override
     public void onEndCollisionCheckX(boolean hasCollided, Direction direction, MapEntity entityCollidedWith) {
         // if fireball collides with anything solid on the x axis, it is removed
         if (hasCollided) {
@@ -56,6 +71,13 @@ public class Fireball extends Enemy {
     public void touchedPlayer(Player player) {
         // if fireball touches player, it disappears
         super.touchedPlayer(player);
+        this.mapEntityStatus = MapEntityStatus.REMOVED;
+    }
+
+    @Override
+    public void touchedPlayer2(Player2 player2) {
+        // if fireball touches player, it disappears
+        super.touchedPlayer2(player2);
         this.mapEntityStatus = MapEntityStatus.REMOVED;
     }
 
