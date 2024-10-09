@@ -28,53 +28,53 @@ public class ToadsMap extends Map {
         ArrayList<Enemy> enemies = new ArrayList<>();
 
         // Adding a BugEnemy at a specific location, similar to Map2
-        BugEnemy bugEnemy = new BugEnemy(getMapTile(16, 10).getLocation().subtractY(25), Direction.LEFT);
+        BugEnemy bugEnemy = new BugEnemy(getMapTile(16, 9).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy);
 
 
-        BugEnemy bugEnemy1 = new BugEnemy(getMapTile(2, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy1 = new BugEnemy(getMapTile(2, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy1);
 
-        BugEnemy bugEnemy2 = new BugEnemy(getMapTile(3, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy2 = new BugEnemy(getMapTile(3,12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy2);
 
-        BugEnemy bugEnemy3 = new BugEnemy(getMapTile(4, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy3 = new BugEnemy(getMapTile(4, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy3);
 
-        BugEnemy bugEnemy4 = new BugEnemy(getMapTile(5, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy4 = new BugEnemy(getMapTile(5, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy4);
 
-        BugEnemy bugEnemy5 = new BugEnemy(getMapTile(6, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy5 = new BugEnemy(getMapTile(6, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy5);
 
-        BugEnemy bugEnemy6 = new BugEnemy(getMapTile(7, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy6 = new BugEnemy(getMapTile(7, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy6);
 
-        BugEnemy bugEnemy7 = new BugEnemy(getMapTile(8, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy7 = new BugEnemy(getMapTile(8, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy7);
 
-        BugEnemy bugEnemy8 = new BugEnemy(getMapTile(9, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy8 = new BugEnemy(getMapTile(9, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy8);
 
-        BugEnemy bugEnemy9 = new BugEnemy(getMapTile(10, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy9 = new BugEnemy(getMapTile(10, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy9);
 
-        BugEnemy bugEnemy10 = new BugEnemy(getMapTile(11, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy10 = new BugEnemy(getMapTile(11, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy10);
 
-        BugEnemy bugEnemy11 = new BugEnemy(getMapTile(12, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy11 = new BugEnemy(getMapTile(12, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy11);
 
-        BugEnemy bugEnemy12 = new BugEnemy(getMapTile(13, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy12 = new BugEnemy(getMapTile(13, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy12);
 
-        BugEnemy bugEnemy13 = new BugEnemy(getMapTile(14, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy13 = new BugEnemy(getMapTile(14, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy13);
 
-        BugEnemy bugEnemy14 = new BugEnemy(getMapTile(15, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy14 = new BugEnemy(getMapTile(15, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy14);
 
-        BugEnemy bugEnemy15 = new BugEnemy(getMapTile(0, 10).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy15 = new BugEnemy(getMapTile(0, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy15);
 
         // Adding a DinosaurEnemy with a patrol route
