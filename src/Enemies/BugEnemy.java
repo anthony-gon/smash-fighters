@@ -8,6 +8,7 @@ import GameObject.SpriteSheet;
 import Level.Enemy;
 import Level.MapEntity;
 import Level.Player;
+import Level.Player2;
 import Utils.AirGroundState;
 import Utils.Direction;
 import Utils.Point;
@@ -65,6 +66,30 @@ public class BugEnemy extends Enemy {
         moveXHandleCollision(moveAmountX);
 
         super.update(player);
+    }
+    
+    @Override
+    public void update(Player2 player2) {
+        float moveAmountX = 0;
+        float moveAmountY = 0;
+
+        // add gravity (if in air, this will cause bug to fall)
+        moveAmountY += gravity;
+
+        // if on ground, walk forward based on facing direction
+        if (airGroundState == AirGroundState.GROUND) {
+            if (facingDirection == Direction.RIGHT) {
+                moveAmountX += movementSpeed;
+            } else {
+                moveAmountX -= movementSpeed;
+            }
+        }
+
+        // move bug
+        moveYHandleCollision(moveAmountY);
+        moveXHandleCollision(moveAmountX);
+
+        super.update(player2);
     }
 
     @Override

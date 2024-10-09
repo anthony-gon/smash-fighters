@@ -12,6 +12,7 @@ import Level.Player;
 import Level.PlayerListener;
 import Maps.ToadsMap;
 import Maps.Map2; // Ensure you have Map2 class defined
+import Players.Brawler;
 import Players.Knight;
 import Players.Mage;
 import SpriteFont.SpriteFont;
@@ -45,44 +46,47 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     }
 
     @Override
-    public void initialize() {
-        // Get the selected map name from the ScreenCoordinator
-        String selectedMapName = screenCoordinator.getSelectedMap();
-        
-        // Get the selected character from CharacterScreen
-        CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
+public void initialize() {
+    // Get the selected map name from the ScreenCoordinator
+    String selectedMapName = screenCoordinator.getSelectedMap();
+    
+    // Get the selected character from CharacterScreen
+    CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
 
-        // Initialize map based on selected map name
-        if (selectedMapName.equals("ToadsMap")) {
-            this.map = new ToadsMap(); // Assuming ToadsMap corresponds to "ToadsMap"
-        } else if (selectedMapName.equals("MAP 2")) {
-            this.map = new Map2(); // Replace with actual class for "MAP 2"
-        }
-
-        // Setup player based on the selected character
-        if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-            this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
-            this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-        }
-        
-        // Ensure the player is correctly set up with the map and listener
-        this.player.setMap(map);
-        this.player.addListener(this);
-
-        levelClearedScreen = new LevelClearedScreen();
-        levelLoseScreen = new LevelLoseScreen(this);
-
-        this.playLevelScreenState = PlayLevelScreenState.RUNNING;
-
-        // Initialize pause menu options
-        resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
-        exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
-        pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
-
-        // Lock the ESCAPE key initially to prevent immediate toggling
-        keyLocker.lockKey(Key.ESC);
+    // Initialize map based on selected map name
+    if (selectedMapName.equals("ToadsMap")) {
+        this.map = new ToadsMap(); // Assuming ToadsMap corresponds to "ToadsMap"
+    } else if (selectedMapName.equals("MAP 2")) {
+        this.map = new Map2(); // Replace with actual class for "MAP 2"
     }
+
+    // Setup player based on the selected character
+    if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
+        this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+    } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
+        this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+    } else if (selectedCharacter == CharacterScreen.SelectedCharacter.BRAWLER) {
+        // Add this logic to handle Brawler character
+        this.player = new Brawler(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y); // Assuming Brawler class exists
+    }
+
+    // Ensure the player is correctly set up with the map and listener
+    this.player.setMap(map);
+    this.player.addListener(this);
+
+    levelClearedScreen = new LevelClearedScreen();
+    levelLoseScreen = new LevelLoseScreen(this);
+
+    this.playLevelScreenState = PlayLevelScreenState.RUNNING;
+
+    // Initialize pause menu options
+    resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+    exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
+    pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
+
+    // Lock the ESCAPE key initially to prevent immediate toggling
+    keyLocker.lockKey(Key.ESC);
+}
 
     @Override
     public void update() {

@@ -5,6 +5,7 @@ import Engine.GraphicsHandler;
 import GameObject.Rectangle;
 import Level.EnhancedMapTile;
 import Level.Player;
+import Level.Player2;
 import Level.TileType;
 import Utils.AirGroundState;
 import Utils.Direction;
@@ -83,6 +84,55 @@ public class HorizontalMovingPlatform extends EnhancedMapTile {
         }
 
         super.update(player);
+    }
+
+    @Override
+    public void update(Player2 player2) {
+        float startBound = startLocation.x;
+        float endBound = endLocation.x;
+
+        // move platform left or right based on its current direction
+        int moveAmountX = 0;
+        if (direction == Direction.RIGHT) {
+            moveAmountX += movementSpeed;
+        } else if (direction == Direction.LEFT) {
+            moveAmountX -= movementSpeed;
+        }
+
+        moveX(moveAmountX);
+
+        // if platform reaches the start or end location, it turns around
+        // platform may end up going a bit past the start or end location depending on movement speed
+        // this calculates the difference and pushes the platform back a bit so it ends up right on the start or end location
+        if (getX1() + getWidth() >= endBound) {
+            float difference = endBound - (getX1() + getWidth());
+            moveX(-difference);
+            moveAmountX -= difference;
+            direction = Direction.LEFT;
+        } else if (getX1() <= startBound) {
+            float difference = startBound - getX1();
+            moveX(difference);
+            moveAmountX += difference;
+            direction = Direction.RIGHT;
+        }
+
+        // if tile type is NOT PASSABLE, if the platform is moving and hits into the player (x axis), it will push the player
+        if (tileType == TileType.NOT_PASSABLE) {
+            if (intersects(player2) && moveAmountX >= 0 && player2.getBounds().getX1() <= getBounds().getX2()) {
+                player2.moveXHandleCollision(getBounds().getX2() - player2.getBounds().getX1());
+            } else if (intersects(player2) && moveAmountX <= 0 && player2.getBounds().getX2() >= getBounds().getX1()) {
+                player2.moveXHandleCollision(getBounds().getX1() - player2.getBounds().getX2());
+            }
+        }
+
+        // if player is on standing on top of platform, move player by the amount the platform is moving
+        // this will cause the player to "ride" with the moving platform
+        // without this code, the platform would slide right out from under the player
+        if (touching(player2) && (player2.getBounds().getY2() + 1) == getBounds().getY1() && player2.getAirGroundState() == AirGroundState.GROUND) {
+            player2.moveXHandleCollision(moveAmountX);
+        }
+
+        super.update(player2);
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
