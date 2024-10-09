@@ -180,7 +180,8 @@ public class MenuScreen extends Screen {
             menuItem.draw(graphicsHandler);
         }
         // Draw the pointer
-        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20,
+                new Color(49, 207, 240), Color.black, 2);
     }
 
     // Method to load and play background music
