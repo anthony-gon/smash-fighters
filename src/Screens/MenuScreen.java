@@ -88,7 +88,7 @@ public class MenuScreen extends Screen {
 
     public void update() {
         // Update background map (to play tile animations)
-
+        background.update(null);
         // Change menu item "hovered" over
         if (Keyboard.isKeyDown(Key.DOWN) && keyPressTimer == 0) {
             keyPressTimer = 14;
