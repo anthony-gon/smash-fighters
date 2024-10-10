@@ -20,6 +20,14 @@ public class CharacterScreen extends Screen {
     protected int pointerOffsetY = 7;
     protected KeyLocker keyLocker = new KeyLocker();
 
+    // Enum to represent character selections
+    public enum SelectedCharacter {
+        BRAWLER, SWORDSMAN, GUNNER
+    }
+
+    // Field to store the selected character
+    protected SelectedCharacter selectedCharacter = SelectedCharacter.BRAWLER; // Default to BRAWLER
+
     public CharacterScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -51,9 +59,11 @@ public class CharacterScreen extends Screen {
         if (Keyboard.isKeyDown(Key.DOWN) && keyPressTimer == 0) {
             keyPressTimer = 14;
             currentCharacterItemHovered++;
+            System.out.println("Hovered down: currentCharacterItemHovered = " + currentCharacterItemHovered);
         } else if (Keyboard.isKeyDown(Key.UP) && keyPressTimer == 0) {
             keyPressTimer = 14;
             currentCharacterItemHovered--;
+            System.out.println("Hovered up: currentCharacterItemHovered = " + currentCharacterItemHovered);
         } else {
             if (keyPressTimer > 0) {
                 keyPressTimer--;
@@ -67,7 +77,7 @@ public class CharacterScreen extends Screen {
             currentCharacterItemHovered = characterItems.size() - 1;
         }
 
-        // Update pointer location
+        // Update pointer location and item color
         for (int i = 0; i < characterItems.size(); i++) {
             if (i == currentCharacterItemHovered) {
                 characterItems.get(i).setColor(new Color(255, 215, 0)); // Highlighted color
@@ -78,23 +88,47 @@ public class CharacterScreen extends Screen {
                 characterItems.get(i).setColor(new Color(49, 207, 240)); // Default color
             }
         }
-        
 
-        // Handle selection
+        // Handle selection with SPACE key
         if (Keyboard.isKeyUp(Key.SPACE)) {
             keyLocker.unlockKey(Key.SPACE);
         }
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
+            System.out.println("SPACE pressed, currentCharacterItemHovered: " + currentCharacterItemHovered);
             // When a character is selected, transition to the play level screen
+            switch (currentCharacterItemHovered) {
+                case 0:
+                    selectedCharacter = SelectedCharacter.BRAWLER;
+                    System.out.println("Brawler selected");
+                    break;
+                case 1:
+                    selectedCharacter = SelectedCharacter.SWORDSMAN;
+                    System.out.println("Swordsman selected");
+                    break;
+                case 2:
+                    selectedCharacter = SelectedCharacter.GUNNER;
+                    System.out.println("Gunner selected");
+                    break;
+                default:
+                    System.out.println("No character selected");
+                    break;
+            }
+            // Transition to the next game state
             screenCoordinator.setGameState(GameState.LEVEL);
         }
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
+        // Draw character selection buttons
         for (SpriteFont characterItem : characterItems) {
             characterItem.draw(graphicsHandler);
         }
-        // Draw the pointer
+        // Draw the pointer next to the selected character
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+    }
+
+    // Getter to retrieve the selected character
+    public SelectedCharacter getSelectedCharacter() {
+        return selectedCharacter;
     }
 }

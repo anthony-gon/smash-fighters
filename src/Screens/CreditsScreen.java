@@ -4,6 +4,7 @@ import Engine.*;
 import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
+import Level.Player;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 
@@ -79,7 +80,7 @@ public class CreditsScreen extends Screen {
     }
 
     public void update() {
-        background.update(null);
+        background.update((Player) null);
 
         // Only scroll credits upward every 'scrollDelay' frames
         frameCounter++;

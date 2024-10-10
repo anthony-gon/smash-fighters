@@ -352,8 +352,8 @@ public abstract class Player extends GameObject {
             if (mapEntity instanceof Enemy) {
                 if (System.currentTimeMillis() - lastDamage >= 300) {
                     damagePlayer(10);
-                    this.x -= 100;
-                    this.y -= 15;
+                    this.x -= 0;
+                    this.y -= 0;
                     lastDamage = System.currentTimeMillis();
                     if (getPlayerHealth() <= 10) {
                         System.out.println("Player Dead");

@@ -20,7 +20,7 @@ public class Walrus extends NPC {
         super(location.x, location.y, new SpriteSheet(ImageLoader.load("Walrus.png"), 24, 24), "TAIL_DOWN");
         isInteractable = true;
         talkedToTime = 200;
-        textbox.setText("Hello!");
+        textbox.setText("Get that sword away from me!");
         textboxOffsetX = -4;
         textboxOffsetY = -34;
     }
