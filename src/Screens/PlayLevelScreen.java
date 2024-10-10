@@ -11,11 +11,16 @@ import Level.Map;
 import Level.Player;
 import Level.Player2;
 import Level.PlayerListener;
+
+import Level.HealthBar;
+import Maps.TestMap;
 import Maps.ToadsMap;
 import Maps.Map2; // Ensure you have Map2 class defined
+
 import Players.Brawler;
 import Players.Brawler2;
 import Players.Knight;
+import Players.Knight2;
 import Players.Knight2;
 import Players.Mage;
 import Players.Mage2;
@@ -34,6 +39,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
+
+    protected HealthBar healthBar;
     protected Player2 player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
@@ -50,6 +57,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected int pausePointerOffsetX = 20;
     protected int pausePointerOffsetY = 5;
     protected KeyLocker keyLocker = new KeyLocker();
+    protected int previousHealth = -1;
 
     // Music-related properties
     protected Clip musicClip;
@@ -62,7 +70,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     public void initialize() {
         // Get the selected map name from the ScreenCoordinator
         String selectedMapName = screenCoordinator.getSelectedMap();
+
+        this.healthBar = new HealthBar(100, 0, 100, 100);
+        healthBar.loadHealthBars();
+
         CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
+
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
@@ -82,6 +95,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
             this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         }
+        this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         this.player.setMap(map);
         this.player2.setMap(map);
         this.player.addListener(this);
@@ -197,6 +211,16 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             case RUNNING:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
+    
+                // Draw health bar
+                healthBar.draw(graphicsHandler, player.getPlayerHealth());
+    
+                // Only log health when it changes
+                if (player.getPlayerHealth() != previousHealth) {
+                    System.out.println("Player health: " + player.getPlayerHealth());
+                    previousHealth = player.getPlayerHealth();
+                }
+    
                 player2.draw(graphicsHandler);
                 break;
             case LEVEL_COMPLETED:
@@ -212,7 +236,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 break;
         }
     }
-
+    
     private void drawPauseMenu(GraphicsHandler graphicsHandler) {
         graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
 
@@ -220,7 +244,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             menuItem.draw(graphicsHandler);
         }
 
-        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+        // Draw pointer
+        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
+                new Color(49, 207, 240), Color.black, 2);
     }
 
     public PlayLevelScreenState getPlayLevelScreenState() {

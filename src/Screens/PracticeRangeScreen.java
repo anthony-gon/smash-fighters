@@ -10,22 +10,25 @@ import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
-import Maps.PracticeRangeMap; // Ensure you have PracticeRangeMap class defined
+import Maps.PracticeRangeMap;
 import Players.Knight;
 import SpriteFont.SpriteFont;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.awt.Color;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-// This class is for the practice range where players can move around
 public class PracticeRangeScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     protected Player player;
     protected KeyLocker keyLocker = new KeyLocker(); // Locker to handle input
     protected PracticeRangeScreenState practiceRangeScreenState;
-    
+
     // Pause menu variables
     protected SpriteFont resumeOption;
     protected SpriteFont exitToMenuOption;
@@ -34,6 +37,9 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
     protected int pausePointerLocationX, pausePointerLocationY;
     protected int pausePointerOffsetX = 20;
     protected int pausePointerOffsetY = 5;
+
+    // Music-related properties
+    protected Clip musicClip;
 
     public PracticeRangeScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -58,6 +64,9 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
         
         // Lock the ESCAPE key initially to prevent immediate toggling
         keyLocker.lockKey(Key.ESC);
+
+        // Play the background music when the PracticeRangeScreen starts
+        playBackgroundMusic();
     }
 
     @Override
@@ -66,8 +75,10 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
         if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
             if (practiceRangeScreenState == PracticeRangeScreenState.RUNNING) {
                 practiceRangeScreenState = PracticeRangeScreenState.PAUSED;
+                stopBackgroundMusic(); // Stop music when the game is paused
             } else if (practiceRangeScreenState == PracticeRangeScreenState.PAUSED) {
                 practiceRangeScreenState = PracticeRangeScreenState.RUNNING;
+                playBackgroundMusic(); // Resume music when unpaused
             }
             keyLocker.lockKey(Key.ESC); // Lock key to avoid repeated toggling
         }
@@ -121,6 +132,7 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
         if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
             if (currentPauseMenuItemHovered == 0) { // Resume selected
                 practiceRangeScreenState = PracticeRangeScreenState.RUNNING;
+                playBackgroundMusic(); // Resume music when unpaused
             } else if (currentPauseMenuItemHovered == 1) { // Exit to menu selected
                 goBackToMenu();
             }
@@ -164,19 +176,54 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
 
     @Override
     public void onDeath() {
-    }
-
-    public void goBackToMenu() {
-        screenCoordinator.setGameState(GameState.MENU);
-    }
-
-    private enum PracticeRangeScreenState {
-        RUNNING, PAUSED
+        // Handle player death logic here
     }
 
     @Override
     public void onLevelCompleted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onLevelCompleted'");
+        // Handle level completion logic here
+    }
+
+    public void goBackToMenu() {
+        stopBackgroundMusic(); // Stop the music when going back to the menu
+        screenCoordinator.setGameState(GameState.MENU);
+    }
+
+    // Method to load and play background music
+    private void playBackgroundMusic() {
+        try {
+            String filePath = "Resources/PracticeRange.wav"; // Path to your background music
+            File soundFile = new File(filePath);
+
+            if (!soundFile.exists()) {
+                System.err.println("Sound file not found at path: " + soundFile.getAbsolutePath());
+                return;
+            }
+
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+            musicClip = AudioSystem.getClip();
+            musicClip.open(audioInputStream);
+
+            FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeControl.setValue(volumeControl.getMaximum()); // Set to max volume
+
+            musicClip.loop(Clip.LOOP_CONTINUOUSLY); // Play music in a loop
+            musicClip.start();
+        } catch (Exception e) {
+            System.err.println("Error loading or playing background music: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Method to stop the background music
+    private void stopBackgroundMusic() {
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop();
+            musicClip.close();
+        }
+    }
+
+    private enum PracticeRangeScreenState {
+        RUNNING, PAUSED
     }
 }
