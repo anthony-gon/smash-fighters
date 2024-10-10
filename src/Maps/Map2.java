@@ -11,6 +11,7 @@ import NPCs.Walrus;
 import Tilesets.CommonTileset;
 import Tilesets.Map2Tileset;
 import Utils.Direction;
+import Utils.Point;
 
 import java.util.ArrayList;
 
@@ -19,23 +20,21 @@ public class Map2 extends Map {
 
     public Map2() {
         super("map2.txt", new Map2Tileset());
-        this.playerStartPosition = getMapTile(30, 30).getLocation();
+        this.playerStartPosition = new Point(100, 100);
     }
 
     @Override
     public ArrayList<Enemy> loadEnemies() {
         ArrayList<Enemy> enemies = new ArrayList<>();
 
-
         // Adding a BugEnemy at a specific location, similar to Map2
         BugEnemy bugEnemy = new BugEnemy(getMapTile(16, 9).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy);
 
-
         BugEnemy bugEnemy1 = new BugEnemy(getMapTile(2, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy1);
 
-        BugEnemy bugEnemy2 = new BugEnemy(getMapTile(3,12).getLocation(), Direction.LEFT);
+        BugEnemy bugEnemy2 = new BugEnemy(getMapTile(3, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy2);
 
         BugEnemy bugEnemy3 = new BugEnemy(getMapTile(4, 12).getLocation(), Direction.LEFT);
@@ -76,8 +75,9 @@ public class Map2 extends Map {
 
         BugEnemy bugEnemy15 = new BugEnemy(getMapTile(0, 12).getLocation(), Direction.LEFT);
         enemies.add(bugEnemy15);
-        
-        DinosaurEnemy dinosaurEnemy = new DinosaurEnemy(getMapTile(19, 1).getLocation().addY(2), getMapTile(22, 1).getLocation().addY(2), Direction.RIGHT);
+
+        DinosaurEnemy dinosaurEnemy = new DinosaurEnemy(getMapTile(19, 1).getLocation().addY(2),
+                getMapTile(22, 1).getLocation().addY(2), Direction.RIGHT);
         enemies.add(dinosaurEnemy);
 
         return enemies;
@@ -93,9 +93,8 @@ public class Map2 extends Map {
                 getMapTile(27, 6).getLocation(),
                 TileType.JUMP_THROUGH_PLATFORM,
                 3,
-                new Rectangle(0, 6,16,4),
-                Direction.RIGHT
-        );
+                new Rectangle(0, 6, 16, 4),
+                Direction.RIGHT);
         enhancedMapTiles.add(hmp);
 
         EndLevelBox endLevelBox = new EndLevelBox(getMapTile(32, 7).getLocation());
@@ -114,4 +113,3 @@ public class Map2 extends Map {
         return npcs;
     }
 }
-

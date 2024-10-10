@@ -26,7 +26,7 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
     protected Player player;
     protected KeyLocker keyLocker = new KeyLocker(); // Locker to handle input
     protected PracticeRangeScreenState practiceRangeScreenState;
-    
+
     // Pause menu variables
     protected SpriteFont resumeOption;
     protected SpriteFont exitToMenuOption;
@@ -56,7 +56,7 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
         resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
         exitToMenuOption = new SpriteFont("EXIT TO MENU", 300, 250, "fibberish", 30, new Color(49, 207, 240));
         pauseMenuItems = Arrays.asList(resumeOption, exitToMenuOption);
-        
+
         // Lock the ESCAPE key initially to prevent immediate toggling
         keyLocker.lockKey(Key.ESC);
     }
@@ -160,7 +160,8 @@ public class PracticeRangeScreen extends Screen implements PlayerListener {
         pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
 
         // Draw pointer
-        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
+                new Color(49, 207, 240), Color.black, 2);
     }
 
     @Override
