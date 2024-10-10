@@ -295,7 +295,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
             FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
             volumeControl.setValue(volumeControl.getMaximum()); // Set to max volume
-
             musicClip.loop(Clip.LOOP_CONTINUOUSLY); // Play music in a loop
             musicClip.start();
         } catch (Exception e) {

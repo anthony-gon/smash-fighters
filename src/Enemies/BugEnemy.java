@@ -21,13 +21,13 @@ import java.util.HashMap;
 public class BugEnemy extends Enemy {
 
     private float gravity = .5f;
-    private float movementSpeed = .5f;
+    private float movementSpeed = .0f;
     private Direction startFacingDirection;
     private Direction facingDirection;
     private AirGroundState airGroundState;
 
     public BugEnemy(Point location, Direction facingDirection) {
-        super(location.x, location.y, new SpriteSheet(ImageLoader.load("BugEnemy.png"), 24, 15), "WALK_LEFT");
+        super(location.x, location.y, new SpriteSheet(ImageLoader.load("Empty.png"), 24, 15), "WALK_LEFT");
         this.startFacingDirection = facingDirection;
         this.initialize();
     }
