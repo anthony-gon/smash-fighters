@@ -14,6 +14,7 @@ import Maps.PracticeRangeMap; // Ensure you have PracticeRangeMap class defined
 import Players.Knight;
 import SpriteFont.SpriteFont;
 import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
