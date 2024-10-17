@@ -3,14 +3,15 @@ package Players;
 import Builders.FrameBuilder;
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
+import Engine.Key;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
-import Level.Player2;
+import Level.Player;
 
 import java.util.HashMap;
 
-public class Knight2 extends Player2 {
+public class Knight2 extends Player {
 
         public Knight2(float x, float y) {
                 super(new SpriteSheet(ImageLoader.load("Knight.png"), 22, 24), x, y, "STAND_RIGHT");
@@ -20,6 +21,12 @@ public class Knight2 extends Player2 {
                 jumpDegrade = .5f;
                 walkSpeed = 2.3f;
                 momentumYIncrease = .5f;
+                Key JUMP_KEY = Key.I;
+                Key MOVE_LEFT_KEY = Key.J;
+                Key MOVE_RIGHT_KEY = Key.L;
+                Key CROUCH_KEY = Key.K;
+                Key ATTACK_KEY = Key.O;
+                setMovementKeys(JUMP_KEY, MOVE_LEFT_KEY, MOVE_RIGHT_KEY, CROUCH_KEY, ATTACK_KEY);
         }
 
         public void update() {

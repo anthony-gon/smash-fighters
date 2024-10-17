@@ -6,7 +6,6 @@ import GameObject.Frame;
 import GameObject.SpriteSheet;
 import Level.EnhancedMapTile;
 import Level.Player;
-import Level.Player2;
 import Level.TileType;
 import Utils.Point;
 
@@ -27,13 +26,7 @@ public class EndLevelBox extends EnhancedMapTile {
         }
     }
 
-    @Override
-    public void update(Player2 player2) {
-        super.update(player2);
-        if (intersects(player2)) {
-            player2.completeLevel();
-        }
-    }
+    
 
     @Override
     public HashMap<String, Frame[]> loadAnimations(SpriteSheet spriteSheet) {

@@ -6,11 +6,11 @@ import Engine.ImageLoader;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
-import Level.Player2;
+import Level.Player;
 
 import java.util.HashMap;
 
-public class Brawler2 extends Player2 {
+public class Brawler2 extends Player {
 
     public Brawler2(float x, float y) {
         super(new SpriteSheet(ImageLoader.load("Brawler.png"), 12, 12), x, y, "STAND_RIGHT");

@@ -44,14 +44,7 @@ public class Enemy extends MapEntity {
     public void touchedPlayer(Player player) {
         player.hurtPlayer(this);
     }
-    public void touchedPlayer2(Player2 player2) {
-        player2.hurtPlayer(this);
-    }
+    
 
-    public void update(Player2 player2) {
-        super.update();
-        if (intersects(player2)) {
-            touchedPlayer2(player2);
-        }
-        }
+    
 }

@@ -6,11 +6,11 @@ import Engine.ImageLoader;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
-import Level.Player2;
+import Level.Player;
 
 import java.util.HashMap;
 
-public class Mage2 extends Player2 {
+public class Mage2 extends Player {
 
     public Mage2(float x, float y) {
         super(new SpriteSheet(ImageLoader.load("FireMage.png"), 22, 24), x, y, "STAND_RIGHT");

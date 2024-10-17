@@ -57,12 +57,7 @@ public class NPC extends MapEntity {
                 (int) getCalibratedYLocation() + textboxOffsetY);
     }
 
-    public void update(Player2 player2) {
-        super.update();
-        checkTalkedTo(player2);
-        textbox.setLocation((int) getCalibratedXLocation() + textboxOffsetX,
-                (int) getCalibratedYLocation() + textboxOffsetY);
-    }
+    
 
     public void checkTalkedTo(Player player) {
         if (isInteractable && intersects(player) && Keyboard.isKeyDown(Key.SPACE)) {
@@ -81,22 +76,7 @@ public class NPC extends MapEntity {
         }
     }
 
-    public void checkTalkedTo(Player2 player2) {
-        if (isInteractable && intersects(player2) && Keyboard.isKeyDown(Key.SPACE)) {
-            talkedTo = true;
-            if (talkedToTime >= 0) {
-                timer = talkedToTime;
-            }
-        }
-
-        if (talkedTo && talkedToTime >= 0 && timer == 0) {
-            talkedTo = false;
-        }
-
-        if (timer > 0) {
-            timer--;
-        }
-    }
+    
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {

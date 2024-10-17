@@ -9,7 +9,6 @@ import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
-import Level.Player2;
 import Level.PlayerListener;
 
 import Level.HealthBar;
@@ -41,7 +40,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected Player player;
 
     protected HealthBar healthBar;
-    protected Player2 player2;
+    protected Player player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -136,9 +135,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         switch (playLevelScreenState) {
             case RUNNING:
                 player.update();
-                map.update(player);
                 player2.update();
-                map.update2(player2);
+                map.update(player);
+                map.update(player2);
                 break;
 
             case LEVEL_COMPLETED:

@@ -354,13 +354,7 @@ public abstract class Map {
         camera.update(player);
     }
 
-    public void update2(Player2 player2) {
-        if (adjustCamera) {
-            adjustMovementY(player2);
-            adjustMovementX(player2);
-        }
-        camera.update(player2);
-    }
+    
 
     // based on the player's current X position (which in a level can potentially be
     // updated each frame),
@@ -371,8 +365,7 @@ public abstract class Map {
     private void adjustMovementX(Player player) {
     }
 
-    private void adjustMovementX(Player2 player2) {
-    }
+    
 
     // based on the player's current Y position (which in a level can potentially be
     // updated each frame),
@@ -383,8 +376,7 @@ public abstract class Map {
     private void adjustMovementY(Player player) {
     }
 
-    private void adjustMovementY(Player2 player2) {
-    }
+    
 
     public void reset() {
         setupMap();

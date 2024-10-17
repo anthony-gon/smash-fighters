@@ -60,6 +60,14 @@ public abstract class Player extends GameObject {
         levelState = LevelState.RUNNING;
     }
 
+    public void setMovementKeys(Key JUMP_KEY, Key MOVE_LEFT_KEY, Key MOVE_RIGHT_KEY, Key CROUCH_KEY, Key ATTACK_KEY) {
+        this.JUMP_KEY = JUMP_KEY;
+        this.MOVE_LEFT_KEY = MOVE_LEFT_KEY;
+        this.MOVE_RIGHT_KEY = MOVE_RIGHT_KEY;
+        this.CROUCH_KEY = CROUCH_KEY;
+        this.ATTACK_KEY = ATTACK_KEY;
+    }
+
     public int getPlayerHealth() {
         return this.playerHealth;
     }
