@@ -10,16 +10,12 @@ import Game.ScreenCoordinator;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
-
 import Level.HealthBar;
-import Maps.TestMap;
 import Maps.ToadsMap;
-import Maps.Map2; // Ensure you have Map2 class defined
-
+import Maps.Map2;
 import Players.Brawler;
 import Players.Brawler2;
 import Players.Knight;
-import Players.Knight2;
 import Players.Knight2;
 import Players.Mage;
 import Players.Mage2;
@@ -37,10 +33,10 @@ import java.util.List;
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
-    protected Player player;
+    protected Player player;  // Player 1
+    protected Player player2; // Player 2
 
     protected HealthBar healthBar;
-    protected Player player2;
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -73,8 +69,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.healthBar = new HealthBar(100, 0, 100, 100);
         healthBar.loadHealthBars();
 
-        CharacterScreen.SelectedCharacter selectedCharacter = screenCoordinator.getCharacterScreen().getSelectedCharacter();
-
+        // Get selected characters for Player 1 and Player 2 from CharacterScreen
+        CharacterScreen.SelectedCharacter selectedCharacterP1 = screenCoordinator.getCharacterScreen().getSelectedCharacterP1();
+        CharacterScreen.SelectedCharacter selectedCharacterP2 = screenCoordinator.getCharacterScreen().getSelectedCharacterP2();
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
@@ -83,18 +80,28 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             this.map = new Map2();
         }
 
-        // Setup player and player2 based on the selected character
-        if (selectedCharacter == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-            this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-            this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.BRAWLER) {
+        // Setup player 1 based on the selected character
+        if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.BRAWLER) {
             this.player = new Brawler(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-            this.player2 = new Brawler2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-        } else if (selectedCharacter == CharacterScreen.SelectedCharacter.GUNNER) {
+        } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
+            this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+        } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.GUNNER) {
             this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
-            this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
         }
-        this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+
+        // Setup player 2 based on the selected character
+        if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
+            this.player2 = new Brawler2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+        } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
+            this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+        } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.GUNNER) {
+            this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+        }
+
+        // **Assign movement keys for Player 2 (JIKL)**
+        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.U);  // JIKL for movement, U for attack
+
+        // Attach players to the map and add listeners
         this.player.setMap(map);
         this.player2.setMap(map);
         this.player.addListener(this);
@@ -134,8 +141,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         switch (playLevelScreenState) {
             case RUNNING:
-                player.update();
-                player2.update();
+                try {
+                    player.update();  // Player 1
+                    player2.update(); // Player 2
+                } catch (NullPointerException e) {
+                    System.err.println("Error updating player: " + e.getMessage());
+                }
                 map.update(player);
                 map.update(player2);
                 break;
@@ -209,25 +220,19 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(graphicsHandler);
-                player.draw(graphicsHandler);
-    
-                // Draw health bar
-                healthBar.draw(graphicsHandler, player.getPlayerHealth());
-    
-                // Only log health when it changes
-                if (player.getPlayerHealth() != previousHealth) {
-                    System.out.println("Player health: " + player.getPlayerHealth());
-                    previousHealth = player.getPlayerHealth();
-                }
-    
-                player2.draw(graphicsHandler);
+                player.draw(graphicsHandler); // Draw Player 1
+                player2.draw(graphicsHandler); // Draw Player 2
+                healthBar.draw(graphicsHandler, player.getPlayerHealth()); // Draw Player 1's health bar
                 break;
+
             case LEVEL_COMPLETED:
                 levelClearedScreen.draw(graphicsHandler);
                 break;
+
             case LEVEL_LOSE:
                 levelLoseScreen.draw(graphicsHandler);
                 break;
+
             case PAUSED:
                 map.draw(graphicsHandler);
                 player.draw(graphicsHandler);
@@ -235,7 +240,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 break;
         }
     }
-    
+
     private void drawPauseMenu(GraphicsHandler graphicsHandler) {
         graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
 
