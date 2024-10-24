@@ -127,4 +127,14 @@ public class Keyboard {
 				 put(Key.ESC, 27);
 			}};
     }
+
+    public static boolean isKeyRight(Key k) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isKeyRight'");
+    }
+
+    public static boolean isKeyLeft(Key i) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isKeyLeft'");
+    }
 }

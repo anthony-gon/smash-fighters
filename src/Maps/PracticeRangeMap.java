@@ -63,7 +63,7 @@ public class PracticeRangeMap extends Map {
         npcs.add(walrus);
 
         // Add a new Walrus dummy at (12, 8)
-        Walrus walrusDummy = new Walrus(getMapTile(11, 8).getLocation());
+        Walrus walrusDummy = new Walrus(getMapTile(11, 9).getLocation().subtractY(12));
         npcs.add(walrusDummy);
 
         return npcs;
