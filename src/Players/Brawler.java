@@ -218,14 +218,14 @@ public class Brawler extends Player {
                                 });
 
                                 put("CROUCH_RIGHT", new Frame[] {
-                                                new FrameBuilder(spriteSheet.getSprite(5, 0))
+                                                new FrameBuilder(spriteSheet.getSprite(5, 2))
                                                                 .withScale(3)
                                                                 .withBounds(8, 12, 8, 6)
                                                                 .build()
                                 });
 
                                 put("CROUCH_LEFT", new Frame[] {
-                                                new FrameBuilder(spriteSheet.getSprite(5, 0))
+                                                new FrameBuilder(spriteSheet.getSprite(5, 2))
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 12, 8, 6)
