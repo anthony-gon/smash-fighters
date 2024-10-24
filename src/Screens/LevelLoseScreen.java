@@ -11,22 +11,36 @@ public class LevelLoseScreen extends Screen {
     protected SpriteFont instructions;
     protected KeyLocker keyLocker = new KeyLocker();
     protected PlayLevelScreen playLevelScreen;
+    protected boolean isPlayer1Winner; // Track if Player 1 is the winner
 
-    public LevelLoseScreen(PlayLevelScreen playLevelScreen) {
+    // Constructor that accepts PlayLevelScreen and who the winner is
+    public LevelLoseScreen(PlayLevelScreen playLevelScreen, boolean isPlayer1Winner) {
         this.playLevelScreen = playLevelScreen;
-        initialize();
+        this.isPlayer1Winner = isPlayer1Winner; // Assign the winner flag
+        initialize(); // Initialize the screen with winner details
     }
 
     @Override
     public void initialize() {
-        loseMessage = new SpriteFont("You lose!", 350, 239, "fibberish", 30, Color.white);
-        instructions = new SpriteFont("Press Space to try again or Escape to go back to the main menu", 120, 279,"Arial", 20, Color.white);
-        keyLocker.lockKey(Key.SPACE);
+        // Display a different message based on who won
+        if (isPlayer1Winner) {
+            loseMessage = new SpriteFont("Player 1 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
+        } else {
+            loseMessage = new SpriteFont("Player 2 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
+        }
+        
+        instructions = new SpriteFont("Press Space to play again or Escape to return to menu", 
+                                      80, 500, "Arial", 10, Color.white);
+        instructions.setOutlineColor(Color.black);
+        instructions.setOutlineThickness(2);
+
+        keyLocker.lockKey(Key.SPACE); // Lock keys initially
         keyLocker.lockKey(Key.ESC);
     }
 
     @Override
     public void update() {
+        // Unlock keys when they are released
         if (Keyboard.isKeyUp(Key.SPACE)) {
             keyLocker.unlockKey(Key.SPACE);
         }
@@ -34,16 +48,22 @@ public class LevelLoseScreen extends Screen {
             keyLocker.unlockKey(Key.ESC);
         }
 
-        // if space is pressed, reset level. if escape is pressed, go back to main menu
+        // If space is pressed, reset the level
         if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
-            playLevelScreen.resetLevel();
-        } else if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
-            playLevelScreen.goBackToMenu();
+            playLevelScreen.resetLevel(); // Reset the level
+        }
+        // If escape is pressed, go back to the main menu
+        else if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
+            playLevelScreen.goBackToMenu(); // Go back to the main menu
         }
     }
 
+    @Override
     public void draw(GraphicsHandler graphicsHandler) {
+        // Fill the background with black color
         graphicsHandler.drawFilledRectangle(0, 0, ScreenManager.getScreenWidth(), ScreenManager.getScreenHeight(), Color.black);
+        
+        // Draw the win/lose message and instructions
         loseMessage.draw(graphicsHandler);
         instructions.draw(graphicsHandler);
     }

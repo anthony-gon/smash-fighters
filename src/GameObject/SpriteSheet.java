@@ -11,13 +11,13 @@ public class SpriteSheet {
 	protected int rowLength;
 	protected int columnLength;
 
-	public SpriteSheet(BufferedImage image, int spriteWidth, int spriteHeight) {
+	public SpriteSheet(BufferedImage image, int d, int spriteHeight) {
 		
 		this.image = image;
-		this.spriteWidth = spriteWidth;
+		this.spriteWidth = d;
 		this.spriteHeight = spriteHeight;
 		this.rowLength = image.getHeight() / spriteHeight;
-		this.columnLength = image.getWidth() / spriteWidth;
+		this.columnLength = image.getWidth() / d;
 	}
 
 	// returns a subimage from the sprite sheet image based on the row and column
