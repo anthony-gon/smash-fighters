@@ -117,7 +117,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         
 
         levelClearedScreen = new LevelClearedScreen();
-        levelLoseScreen = new LevelLoseScreen(this);
+        levelLoseScreen = new LevelLoseScreen(this, attackProcessed);
+
+        
 
         this.playLevelScreenState = PlayLevelScreenState.RUNNING;
 
