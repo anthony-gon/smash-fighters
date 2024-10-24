@@ -33,10 +33,13 @@ import java.util.List;
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
-    protected Player player;  // Player 1
+
+    protected Player player; // Player 1
     protected Player player2; // Player 2
 
-    protected HealthBar healthBar;
+    protected HealthBar playerOneHB;
+    protected HealthBar playerTwoHB;
+
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
     protected LevelClearedScreen levelClearedScreen;
@@ -66,12 +69,15 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Get the selected map name from the ScreenCoordinator
         String selectedMapName = screenCoordinator.getSelectedMap();
 
-        this.healthBar = new HealthBar(100, 0, 100, 100);
-        healthBar.loadHealthBars();
+        CharacterScreen.SelectedCharacter selectedCharacterP1 = screenCoordinator.getCharacterScreen()
+                .getSelectedCharacterP1();
+        CharacterScreen.SelectedCharacter selectedCharacterP2 = screenCoordinator.getCharacterScreen()
+                .getSelectedCharacterP2();
 
-        // Get selected characters for Player 1 and Player 2 from CharacterScreen
-        CharacterScreen.SelectedCharacter selectedCharacterP1 = screenCoordinator.getCharacterScreen().getSelectedCharacterP1();
-        CharacterScreen.SelectedCharacter selectedCharacterP2 = screenCoordinator.getCharacterScreen().getSelectedCharacterP2();
+        this.playerOneHB = new HealthBar(0, 100, 100);
+        this.playerTwoHB = new HealthBar(1, 100, 100);
+        playerOneHB.loadHealthBars();
+        playerTwoHB.loadHealthBars();
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("ToadsMap")) {
@@ -91,15 +97,15 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         // Setup player 2 based on the selected character
         if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
-            this.player2 = new Brawler2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+            this.player2 = new Brawler2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y); // Player 2
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-            this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+            this.player2 = new Knight2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y); // Player 2
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.GUNNER) {
-            this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);  // Player 2
+            this.player2 = new Mage2(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y); // Player 2
         }
 
         // **Assign movement keys for Player 2 (JIKL)**
-        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.U);  // JIKL for movement, U for attack
+        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.U); // JIKL for movement, U for attack
 
         // Attach players to the map and add listeners
         this.player.setMap(map);
@@ -142,7 +148,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         switch (playLevelScreenState) {
             case RUNNING:
                 try {
-                    player.update();  // Player 1
+                    player.update(); // Player 1
                     player2.update(); // Player 2
                 } catch (NullPointerException e) {
                     System.err.println("Error updating player: " + e.getMessage());
@@ -220,9 +226,23 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(graphicsHandler);
+
                 player.draw(graphicsHandler); // Draw Player 1
                 player2.draw(graphicsHandler); // Draw Player 2
-                healthBar.draw(graphicsHandler, player.getPlayerHealth()); // Draw Player 1's health bar
+
+                playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
+                playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
+
+                // Draw Second Health Bar Here
+
+                // Draw health bar
+
+                // Only log health when it changes
+                if (player.getPlayerHealth() != previousHealth) {
+                    System.out.println("Player health: " + player.getPlayerHealth());
+                    previousHealth = player.getPlayerHealth();
+                }
+
                 break;
 
             case LEVEL_COMPLETED:
