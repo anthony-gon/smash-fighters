@@ -51,11 +51,11 @@ public class MapSelectScreen extends Screen {
     @Override
     public void initialize() {
         // Initialize the map select buttons
-        map1 = new SpriteFont("ToadsMap", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+        map1 = new SpriteFont("Inferno", 300, 200, "fibberish", 30, new Color(49, 207, 240));
         map1.setOutlineColor(Color.black);
         map1.setOutlineThickness(3);
 
-        map2 = new SpriteFont("MAP 2", 300, 300, "fibberish", 30, new Color(49, 207, 240));
+        map2 = new SpriteFont("Ice Kingdom", 300, 300, "fibberish", 30, new Color(49, 207, 240));
         map2.setOutlineColor(Color.black);
         map2.setOutlineThickness(3);
 
@@ -250,31 +250,36 @@ public class MapSelectScreen extends Screen {
         g2d.setColor(Color.WHITE);
         g2d.fillPolygon(new int[]{centerX - 10, centerX + 10, centerX}, new int[]{centerY - wheelRadius - 20, centerY - wheelRadius - 20, centerY - wheelRadius}, 3);
     }
+// Method to draw the small red, orange, yellow pixelated explosion effect
+private void drawSmallExplosion(GraphicsHandler graphicsHandler) {
+    Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // Method to draw the small red, orange, yellow pixelated explosion effect
-    private void drawSmallExplosion(GraphicsHandler graphicsHandler) {
-        Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    // Center of explosion
+    int centerX = 400;
+    int centerY = 300;
 
-        // Center of explosion
-        int centerX = 400;
-        int centerY = 300;
+    // Ensure pixelExplosionRadius is a positive number
+    int pixelExplosionRadius = Math.max(1, this.pixelExplosionRadius); // If radius is 0 or negative, default to 1
 
-        // Draw random small rectangles in red, orange, yellow colors
-        for (int i = 0; i < 50; i++) {
-            int randomX = centerX + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
-            int randomY = centerY + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
-            int rectSize = random.nextInt(8) + 3; // Smaller particle sizes
+    // Draw random small rectangles in red, orange, yellow colors
+    for (int i = 0; i < 50; i++) {
+        int randomX = centerX + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
+        int randomY = centerY + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
+        
+        // Ensure rectSize is a positive number
+        int rectSize = Math.max(3, random.nextInt(8) + 3); // Minimum size 3
 
-            // Random red, orange, or yellow color
-            Color particleColor = new Color(
-                    random.nextInt(56) + 200, // Red/orange tones
-                    random.nextInt(150) + 100, // Orange/yellow tones
-                    random.nextInt(56));       // Less blue for fiery effect
+        // Random red, orange, or yellow color
+        Color particleColor = new Color(
+                random.nextInt(56) + 200, // Red/orange tones
+                random.nextInt(150) + 100, // Orange/yellow tones
+                random.nextInt(56));       // Less blue for fiery effect
 
-            g2d.setColor(particleColor);
-            g2d.fillRect(randomX, randomY, rectSize, rectSize); // Draw the small rectangle
-        }
+        g2d.setColor(particleColor);
+        g2d.fillRect(randomX, randomY, rectSize, rectSize); // Draw the small rectangle
     }
+}
+
 }
 

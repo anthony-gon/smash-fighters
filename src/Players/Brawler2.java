@@ -20,7 +20,7 @@ public class Brawler2 extends Player {
         protected long attackboxTimer = System.currentTimeMillis();
 
         public Brawler2(float x, float y) {
-                super(new SpriteSheet(ImageLoader.load("Brawler2.png"), 24, 24), x, y, "STAND_RIGHT");
+                super(new SpriteSheet(ImageLoader.load("Brawler.png"), 24, 24), x, y, "STAND_RIGHT");
                 gravity = .5f;
                 terminalVelocityY = 6f;
                 jumpHeight = 14.5f;
@@ -283,24 +283,31 @@ public class Brawler2 extends Player {
                                 put("ATTACK_RIGHT", new Frame[] {
                                                 new FrameBuilder(spriteSheet.getSprite(2, 0), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 1), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 2), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 3), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 4), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 5), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 6), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build()
                                 });
 
@@ -308,30 +315,37 @@ public class Brawler2 extends Player {
                                                 new FrameBuilder(spriteSheet.getSprite(2, 0), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 1), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 2), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 3), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 4), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 5), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(2, 6), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build()
                                 });
                         }
