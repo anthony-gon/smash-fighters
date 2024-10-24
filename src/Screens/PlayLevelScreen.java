@@ -98,11 +98,14 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         int player2OffsetX = 430;
         // Setup player 2 based on the selected character
         if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
-            this.player2 = new Brawler2(map.getPlayerStartPosition().x + player2OffsetX , map.getPlayerStartPosition().y); // Player 2
+            this.player2 = new Brawler2(map.getPlayerStartPosition().x + player2OffsetX,
+                    map.getPlayerStartPosition().y); // Player 2
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-            this.player2 = new Knight2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player 2
+            this.player2 = new Knight2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
+                                                                                                                         // 2
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.GUNNER) {
-            this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player 2
+            this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
+                                                                                                                       // 2
         }
 
         // **Assign movement keys for Player 2 (JIKL)**
@@ -113,8 +116,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.player2.setMap(map);
         this.player.addListener(this);
         this.player2.addListener(this);
-
-        
 
         levelClearedScreen = new LevelClearedScreen();
         levelLoseScreen = new LevelLoseScreen(this, attackProcessed);
@@ -155,11 +156,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 try {
                     player.update(); // Player 1
                     player2.update(); // Player 2
-        
+
                     if (player instanceof Knight && player2 instanceof Knight2) {
                         Knight knight1 = (Knight) player;
                         Knight2 knight2 = (Knight2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (knight1.getAttackHitbox().intersects(knight2.getHitbox())) {
                                 handleAttackCollision1();
@@ -170,10 +171,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(knight2.getHitbox()) && 
-                            !knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
+                        if (!knight1.getAttackHitbox().intersects(knight2.getHitbox()) &&
+                                !knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -181,7 +182,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Brawler && player2 instanceof Brawler2) {
                         Brawler brawler1 = (Brawler) player;
                         Brawler2 brawler2 = (Brawler2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (brawler1.getAttackHitbox().intersects(brawler2.getHitbox())) {
                                 handleAttackCollision1();
@@ -192,10 +193,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(brawler2.getHitbox()) && 
-                            !brawler2.getAttackHitbox().intersects(brawler1.getHitbox())) {
+                        if (!brawler1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
+                                !brawler2.getAttackHitbox().intersects(brawler1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -203,7 +204,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Mage && player2 instanceof Mage2) {
                         Mage mage1 = (Mage) player;
                         Mage2 mage2 = (Mage2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (mage1.getAttackHitbox().intersects(mage2.getHitbox())) {
                                 handleAttackCollision1();
@@ -214,10 +215,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(mage2.getHitbox()) && 
-                            !mage2.getAttackHitbox().intersects(mage1.getHitbox())) {
+                        if (!mage1.getAttackHitbox().intersects(mage2.getHitbox()) &&
+                                !mage2.getAttackHitbox().intersects(mage1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -225,7 +226,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Knight && player2 instanceof Mage2) {
                         Knight knight1 = (Knight) player;
                         Mage2 mage2 = (Mage2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (knight1.getAttackHitbox().intersects(mage2.getHitbox())) {
                                 handleAttackCollision1();
@@ -236,10 +237,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(mage2.getHitbox()) && 
-                            !mage2.getAttackHitbox().intersects(knight1.getHitbox())) {
+                        if (!knight1.getAttackHitbox().intersects(mage2.getHitbox()) &&
+                                !mage2.getAttackHitbox().intersects(knight1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -247,7 +248,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Knight && player2 instanceof Brawler2) {
                         Knight knight1 = (Knight) player;
                         Brawler2 brawler2 = (Brawler2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (knight1.getAttackHitbox().intersects(brawler2.getHitbox())) {
                                 handleAttackCollision1();
@@ -258,10 +259,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(brawler2.getHitbox()) && 
-                            !brawler2.getAttackHitbox().intersects(knight1.getHitbox())) {
+                        if (!knight1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
+                                !brawler2.getAttackHitbox().intersects(knight1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -269,7 +270,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Mage && player2 instanceof Knight2) {
                         Mage mage1 = (Mage) player;
                         Knight2 knight2 = (Knight2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (mage1.getAttackHitbox().intersects(knight2.getHitbox())) {
                                 handleAttackCollision1();
@@ -280,10 +281,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(knight2.getHitbox()) && 
-                            !knight2.getAttackHitbox().intersects(mage1.getHitbox())) {
+                        if (!mage1.getAttackHitbox().intersects(knight2.getHitbox()) &&
+                                !knight2.getAttackHitbox().intersects(mage1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -291,7 +292,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Mage && player2 instanceof Brawler2) {
                         Mage mage1 = (Mage) player;
                         Brawler2 brawler2 = (Brawler2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (mage1.getAttackHitbox().intersects(brawler2.getHitbox())) {
                                 handleAttackCollision1();
@@ -302,10 +303,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(brawler2.getHitbox()) && 
-                            !brawler2.getAttackHitbox().intersects(mage1.getHitbox())) {
+                        if (!mage1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
+                                !brawler2.getAttackHitbox().intersects(mage1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -313,7 +314,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Brawler && player2 instanceof Knight2) {
                         Brawler brawler1 = (Brawler) player;
                         Knight2 knight2 = (Knight2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (brawler1.getAttackHitbox().intersects(knight2.getHitbox())) {
                                 handleAttackCollision1();
@@ -324,10 +325,10 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(knight2.getHitbox()) && 
-                            !knight2.getAttackHitbox().intersects(brawler1.getHitbox())) {
+                        if (!brawler1.getAttackHitbox().intersects(knight2.getHitbox()) &&
+                                !knight2.getAttackHitbox().intersects(brawler1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
@@ -335,7 +336,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     if (player instanceof Brawler && player2 instanceof Mage2) {
                         Brawler brawler1 = (Brawler) player;
                         Mage2 mage2 = (Mage2) player2;
-        
+
                         if (!attackProcessed) { // Only check if not processed
                             if (brawler1.getAttackHitbox().intersects(mage2.getHitbox())) {
                                 handleAttackCollision1();
@@ -346,17 +347,14 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                                 attackProcessed = true; // Mark as processed
                             }
                         }
-        
+
                         // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(mage2.getHitbox()) && 
-                            !mage2.getAttackHitbox().intersects(brawler1.getHitbox())) {
+                        if (!brawler1.getAttackHitbox().intersects(mage2.getHitbox()) &&
+                                !mage2.getAttackHitbox().intersects(brawler1.getHitbox())) {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
 
-                    
-
-                    
                 } catch (NullPointerException e) {
                     System.err.println("Error updating player: " + e.getMessage());
                 }
@@ -553,11 +551,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         int newHealth = player2.getPlayerHealth();
 
-
         if (player2.getPlayerHealth() == 10) {
             onDeath(); // Trigger level lose
         } else {
-            
             System.out.println("Player 2 damaged! New health: " + player2.getPlayerHealth());
         }
     }
@@ -569,15 +565,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         int newHealth = player.getPlayerHealth();
 
-
         if (player.getPlayerHealth() == 10) {
-            onDeath(); 
+            onDeath();
         } else {
-            
+
             System.out.println("Player 1 damaged! New health: " + player.getPlayerHealth());
         }
     }
 
 }
-
-    

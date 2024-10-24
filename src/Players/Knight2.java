@@ -344,18 +344,23 @@ public class Knight2 extends Player {
                                 put("ATTACK_RIGHT", new Frame[] {
                                                 new FrameBuilder(spriteSheet.getSprite(0, 0), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 1), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 2), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 3), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 4), 8)
                                                                 .withScale(3)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build()
                                 });
 
@@ -363,22 +368,27 @@ public class Knight2 extends Player {
                                                 new FrameBuilder(spriteSheet.getSprite(0, 0), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 1), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 2), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 3), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build(),
                                                 new FrameBuilder(spriteSheet.getSprite(0, 4), 8)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                                                                .withBounds(8, 9, 8, 9)
                                                                 .build()
                                 });
 
