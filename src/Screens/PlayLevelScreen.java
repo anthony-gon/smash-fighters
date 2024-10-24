@@ -77,9 +77,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
 
         // Initialize map based on selected map name
-        if (selectedMapName.equals("ToadsMap")) {
+        if (selectedMapName.equals("Inferno")) {
             this.map = new ToadsMap();
-        } else if (selectedMapName.equals("MAP 2")) {
+        } else if (selectedMapName.equals("Ice Kingdom")) {
             this.map = new Map2();
         }
 
