@@ -17,6 +17,7 @@ import java.awt.Color;
 public class Mage extends Player {
         private Rectangle hitbox;
         private Rectangle attackHitbox;
+        protected float attackboxTimer = System.currentTimeMillis();
 
         public Mage(float x, float y) {
                 super(new SpriteSheet(ImageLoader.load("Gunner.png"), 23, 23), x, y, "STAND_RIGHT");
@@ -47,13 +48,18 @@ public class Mage extends Player {
                 } else {
                         hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
                 }
+                if (System.currentTimeMillis() - attackboxTimer > 300) {
+                        attackHitbox.setLocation(1000, 1000);
+                }
                 if (getPlayerState() == PlayerState.ATTACKING) {
                         if (getFacingDirection() == Direction.LEFT) {
                                 hitbox.setLocation(getX() + 15 + xOffset, getY() + 18 + yOffset);
                                 attackHitbox.setLocation(getX() + 4, getY() + 38);
+                                attackboxTimer = System.currentTimeMillis();
                         } else {
                                 hitbox.setLocation(getX() + 11 + xOffset, getY() + 18 + yOffset);
                                 attackHitbox.setLocation(getX() + 50, getY() + 38);
+                                attackboxTimer = System.currentTimeMillis();
                         }
                 }
         }

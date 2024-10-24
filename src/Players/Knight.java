@@ -17,6 +17,7 @@ import java.awt.Color; // Add this line
 public class Knight extends Player {
         private Rectangle hitbox;
         private Rectangle attackHitbox;
+        protected long attackboxTimer = System.currentTimeMillis();
 
         public Knight(float x, float y) {
                 super(new SpriteSheet(ImageLoader.load("Knight.png"), 22, 24), x, y, "STAND_RIGHT");
@@ -29,10 +30,10 @@ public class Knight extends Player {
 
                 this.hitbox = new Rectangle(x, y, 33, 39);
                 hitbox.setColor(Color.RED);
-                
+
                 this.attackHitbox = new Rectangle(x, y, 15, 30);
                 attackHitbox.setColor(Color.BLUE);
-                
+
         }
 
         public void update() {
@@ -45,36 +46,41 @@ public class Knight extends Player {
 
                 if (getFacingDirection() == Direction.LEFT) {
                         hitbox.setLocation(getX() + 22 + xOffset, getY() + yOffset); // Offset left
-        }       else {
-                        hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
-        }
-        if (getPlayerState() == PlayerState.ATTACKING) {
-                if (getFacingDirection() == Direction.LEFT) {
-                        hitbox.setLocation(getX() + 15  + xOffset, getY() + 18  + yOffset);
-                        attackHitbox.setLocation(getX()+4, getY() +38);
                 } else {
-                        hitbox.setLocation(getX() + 11  + xOffset, getY() + 18  + yOffset);
-                        attackHitbox.setLocation(getX() + 50, getY() + 38);
+                        hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
                 }
-        }
+                if (System.currentTimeMillis() - attackboxTimer > 300) {
+                        attackHitbox.setLocation(1000, 1000);
+                }
+                if (getPlayerState() == PlayerState.ATTACKING) {
+                        if (getFacingDirection() == Direction.LEFT) {
+                                hitbox.setLocation(getX() + 15 + xOffset, getY() + 18 + yOffset);
+                                attackHitbox.setLocation(getX() + 4, getY() + 38);
+                                attackboxTimer = System.currentTimeMillis();
+                        } else {
+                                hitbox.setLocation(getX() + 11 + xOffset, getY() + 18 + yOffset);
+                                attackHitbox.setLocation(getX() + 50, getY() + 38);
+                                attackboxTimer = System.currentTimeMillis();
+                        }
+                }
         }
 
         public void draw(GraphicsHandler graphicsHandler) {
                 super.draw(graphicsHandler);
-                //hitbox.draw(graphicsHandler);
+                // hitbox.draw(graphicsHandler);
                 if (getPlayerState() == PlayerState.ATTACKING) {
-                        //attackHitbox.draw(graphicsHandler);
+                        // attackHitbox.draw(graphicsHandler);
                 }
                 // drawBounds(graphicsHandler, new Color(255, 0, 0, 170));
         }
 
         public Rectangle getHitbox() {
                 return this.hitbox; // Getter for hitbox
-            }
+        }
 
         public Rectangle getAttackHitbox() {
                 return this.attackHitbox; // Getter for hitbox
-            }
+        }
 
         @Override
         public HashMap<String, Frame[]> loadAnimations(SpriteSheet spriteSheet) {
