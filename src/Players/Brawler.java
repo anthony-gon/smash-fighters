@@ -281,68 +281,68 @@ public class Brawler extends Player {
                                 });
 
                                 put("ATTACK_RIGHT", new Frame[] {
-                                                new FrameBuilder(spriteSheet.getSprite(2, 0), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 0), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 1), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 1), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 2), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 2), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 3), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 3), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 4), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 4), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 5), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 5), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 6), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 6), 5)
                                                                 .withScale(3)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build()
                                 });
 
                                 put("ATTACK_LEFT", new Frame[] {
-                                                new FrameBuilder(spriteSheet.getSprite(2, 0), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 0), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 1), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 1), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 2), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 2), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 3), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 3), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 4), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 4), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 5), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 5), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
                                                                 .build(),
-                                                new FrameBuilder(spriteSheet.getSprite(2, 6), 8)
+                                                new FrameBuilder(spriteSheet.getSprite(2, 6), 5)
                                                                 .withScale(3)
                                                                 .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
                                                                 .withBounds(8, 9, 8, 9)
