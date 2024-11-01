@@ -28,12 +28,7 @@ public class Knight2 extends Player {
                 jumpDegrade = .5f;
                 walkSpeed = 2.3f;
                 momentumYIncrease = .5f;
-                Key JUMP_KEY = Key.I;
-                Key MOVE_LEFT_KEY = Key.J;
-                Key MOVE_RIGHT_KEY = Key.L;
-                Key CROUCH_KEY = Key.K;
-                Key ATTACK_KEY = Key.O;
-                setMovementKeys(JUMP_KEY, MOVE_LEFT_KEY, MOVE_RIGHT_KEY, CROUCH_KEY, ATTACK_KEY);
+                
 
                 this.hitbox = new Rectangle(x, y, 33, 39);
                 hitbox.setColor(Color.RED);
