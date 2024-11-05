@@ -111,7 +111,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         }
 
         // **Assign movement keys for Player 2 (JIKL)**
-        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.U); // JIKL for movement, U for attack
+        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
 
         // Attach players to the map and add listeners
         this.player.setMap(map);
