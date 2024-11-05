@@ -9,6 +9,7 @@ import Screens.GroupNameScreen;
 import Screens.MenuScreen;
 import Screens.PlayLevelScreen;
 import Screens.PracticeRangeScreen;
+import Screens.LevelLoseScreen;
 import Screens.HowToPlayScreen;
 import Screens.IntroScreen;
 import Screens.MapSelectScreen;

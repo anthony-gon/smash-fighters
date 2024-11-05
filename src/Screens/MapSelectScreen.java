@@ -55,7 +55,7 @@ public class MapSelectScreen extends Screen {
         map1.setOutlineColor(Color.black);
         map1.setOutlineThickness(3);
 
-        map2 = new SpriteFont("Ice Kingdom", 300, 300, "fibberish", 30, new Color(49, 207, 240));
+        map2 = new SpriteFont("Tundra", 300, 300, "fibberish", 30, new Color(49, 207, 240));
         map2.setOutlineColor(Color.black);
         map2.setOutlineThickness(3);
 

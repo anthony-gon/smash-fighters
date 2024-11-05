@@ -5,9 +5,9 @@ import SpriteFont.SpriteFont;
 
 import java.awt.*;
 
-// This is the class for the level lose screen
+// This is the class for the winner/lose screen
 public class LevelLoseScreen extends Screen {
-    protected SpriteFont loseMessage;
+    protected SpriteFont winMessage;
     protected SpriteFont instructions;
     protected KeyLocker keyLocker = new KeyLocker();
     protected PlayLevelScreen playLevelScreen;
@@ -17,6 +17,10 @@ public class LevelLoseScreen extends Screen {
     public LevelLoseScreen(PlayLevelScreen playLevelScreen, boolean isPlayer1Winner) {
         this.playLevelScreen = playLevelScreen;
         this.isPlayer1Winner = isPlayer1Winner; // Assign the winner flag
+
+        // Debug statement to confirm the received value of isPlayer1Winner
+        System.out.println("LevelLoseScreen initialized with isPlayer1Winner: " + isPlayer1Winner);
+        
         initialize(); // Initialize the screen with winner details
     }
 
@@ -24,9 +28,9 @@ public class LevelLoseScreen extends Screen {
     public void initialize() {
         // Display a different message based on who won
         if (isPlayer1Winner) {
-            loseMessage = new SpriteFont("Player 1 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
+            winMessage = new SpriteFont("Player 1 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
         } else {
-            loseMessage = new SpriteFont("Player 2 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
+            winMessage = new SpriteFont("Player 2 Wins!", 300, 200, "fibberish", 30, Color.decode("#FFD700"));
         }
         
         instructions = new SpriteFont("Press Space to play again or Escape to return to menu", 
@@ -63,8 +67,8 @@ public class LevelLoseScreen extends Screen {
         // Fill the background with black color
         graphicsHandler.drawFilledRectangle(0, 0, ScreenManager.getScreenWidth(), ScreenManager.getScreenHeight(), Color.black);
         
-        // Draw the win/lose message and instructions
-        loseMessage.draw(graphicsHandler);
+        // Draw the win message and instructions
+        winMessage.draw(graphicsHandler);
         instructions.draw(graphicsHandler);
     }
 }
