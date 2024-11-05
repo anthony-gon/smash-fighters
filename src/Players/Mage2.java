@@ -20,7 +20,7 @@ public class Mage2 extends Player {
         protected float attackboxTimer = System.currentTimeMillis();
 
         public Mage2(float x, float y) {
-                super(new SpriteSheet(ImageLoader.load("Gunner.png"), 23, 23), x, y, "STAND_RIGHT");
+                super(new SpriteSheet(ImageLoader.load("GunnerBlue.png"), 23, 23), x, y, "STAND_RIGHT");
                 gravity = .5f;
                 terminalVelocityY = 6f;
                 jumpHeight = 14.5f;
