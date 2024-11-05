@@ -76,7 +76,7 @@ public class Mage2 extends Player {
 
                         // add fireball enemy to the map for it to spawn in the level
                         map.addEnemy(fireball);
-                        shootTimer = 51;
+                        shootTimer = 50;
                 }
                 if (shootTimer > 0) {
                         shootTimer--;

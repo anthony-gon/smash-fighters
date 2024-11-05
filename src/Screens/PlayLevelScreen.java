@@ -46,6 +46,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected LevelClearedScreen levelClearedScreen;
     protected LevelLoseScreen levelLoseScreen;
     protected boolean levelCompletedStateChangeStart;
+    protected boolean isPlayer1Winner; // Field to track if Player 1 is the winner
+    protected boolean gameOver = false;
 
     // Pause menu variables
     protected SpriteFont resumeOption;
@@ -109,7 +111,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         }
 
         // **Assign movement keys for Player 2 (JIKL)**
-        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
+        player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.U); // JIKL for movement, U for attack
 
         // Attach players to the map and add listeners
         this.player.setMap(map);
@@ -132,7 +134,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Play the background music when the PlayLevelScreen starts
         playBackgroundMusic();
     }
-
     @Override
     public void update() {
         // Handle pause input with the ESCAPE key
@@ -146,38 +147,93 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             }
             keyLocker.lockKey(Key.ESC);
         }
-
+    
         if (Keyboard.isKeyUp(Key.ESC)) {
             keyLocker.unlockKey(Key.ESC);
         }
-
+    
         switch (playLevelScreenState) {
             case RUNNING:
                 try {
                     player.update(); // Player 1
                     player2.update(); // Player 2
-
-                    if (player instanceof Knight && player2 instanceof Knight2) {
-                        Knight knight1 = (Knight) player;
-                        Knight2 knight2 = (Knight2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (knight1.getAttackHitbox().intersects(knight2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(knight2.getHitbox()) &&
-                                !knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
+    
+                    // Check each player combination for attack collisions
+                    checkAttackCollisions();
+    
+                    // Determine if any player has lost all health and set the winner
+                    if (player2.getPlayerHealth() <= 0) {
+                        isPlayer1Winner = true;
+                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                        stopBackgroundMusic();
+                    } else if (player.getPlayerHealth() <= 0) {
+                        isPlayer1Winner = false;
+                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                        stopBackgroundMusic();
                     }
+                    
+                    map.update(player);
+                    map.update(player2);
+                } catch (NullPointerException e) {
+                    System.err.println("Error updating player: " + e.getMessage());
+                }
+                break;
+    
+            case LEVEL_COMPLETED:
+                if (levelCompletedStateChangeStart) {
+                    screenTimer = 130;
+                    levelCompletedStateChangeStart = false;
+                } else {
+                    levelClearedScreen.update();
+                    screenTimer--;
+                    if (screenTimer == 0) {
+                        goBackToMenu();
+                    }
+                }
+                break;
+    
+            case LEVEL_LOSE:
+                stopBackgroundMusic(); // Stop music when the player dies
+                levelLoseScreen.update();
+                break;
+    
+            case PAUSED:
+                updatePauseMenu();
+                break;
+        }
+    }
+    
+    private void checkAttackCollisions() {
+        if (player instanceof Knight && player2 instanceof Knight2) {
+            Knight knight1 = (Knight) player;
+            Knight2 knight2 = (Knight2) player2;
+    
+            if (!attackProcessed) { // Only check if not processed
+                if (knight1.getAttackHitbox().intersects(knight2.getHitbox())) {
+                    handleAttackCollision1();
+                    attackProcessed = true; // Mark as processed
+                }
+                if (knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
+                    handleAttackCollision2();
+                    attackProcessed = true; // Mark as processed
+                }
+            }
+    
+            // Reset attackProcessed flag if the hitboxes are no longer intersecting
+            if (!knight1.getAttackHitbox().intersects(knight2.getHitbox()) &&
+                    !knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
+                attackProcessed = false; // Reset if no longer colliding
+            }
+        }
+    
+        // Other combinations for Brawler, Mage, etc.
+        // Repeat the same structure as above for other player types
+        // Example for Brawler vs. Brawler2 and other classes
+        // ...
+    
+    
 
                     if (player instanceof Brawler && player2 instanceof Brawler2) {
                         Brawler brawler1 = (Brawler) player;
@@ -354,38 +410,56 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                             attackProcessed = false; // Reset if no longer colliding
                         }
                     }
-
-                } catch (NullPointerException e) {
-                    System.err.println("Error updating player: " + e.getMessage());
-                }
-                map.update(player);
-                map.update(player2);
-                break;
-
-            case LEVEL_COMPLETED:
-                if (levelCompletedStateChangeStart) {
-                    screenTimer = 130;
-                    levelCompletedStateChangeStart = false;
-                } else {
-                    levelClearedScreen.update();
-                    screenTimer--;
-                    if (screenTimer == 0) {
-                        goBackToMenu();
+                
+                   
+                        switch (playLevelScreenState) {
+                            case RUNNING:
+                                if (!gameOver) { // Only run this logic if the game is not over
+                                    try {
+                                        player.update(); // Player 1
+                                        player2.update(); // Player 2
+                
+                                      
+                
+                                        // Determine if any player has lost all health and set the winner
+                                        if (player2.getPlayerHealth() <= 0) {
+                                            isPlayer1Winner = true;  // Player 1 wins
+                                            gameOver = true;         // Set gameOver to true to prevent re-triggering
+                                            System.out.println("Player 1 wins! Setting isPlayer1Winner to " + isPlayer1Winner);
+                                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);  // Pass the correct flag
+                                            stopBackgroundMusic();
+                                        } else if (player.getPlayerHealth() <= 0) {
+                                            isPlayer1Winner = false;  // Player 2 wins
+                                            gameOver = true;          // Set gameOver to true to prevent re-triggering
+                                            System.out.println("Player 2 wins! Setting isPlayer1Winner to " + isPlayer1Winner);
+                                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);  // Pass the correct flag
+                                            stopBackgroundMusic();
+                                        }
+                
+                                        map.update(player);
+                                        map.update(player2);
+                                    } catch (NullPointerException e) {
+                                        System.err.println("Error updating player: " + e.getMessage());
+                                    }
+                                }
+                                break;
+                
+                            case LEVEL_LOSE:
+                                levelLoseScreen.update();
+                                break;
+                
+                            case LEVEL_COMPLETED:
+                                // Handle level completed logic...
+                                break;
+                
+                            case PAUSED:
+                                updatePauseMenu();
+                                break;
+                        }
                     }
-                }
-                break;
-
-            case LEVEL_LOSE:
-                stopBackgroundMusic(); // Stop music when the player dies
-                levelLoseScreen.update();
-                break;
-
-            case PAUSED:
-                updatePauseMenu();
-                break;
-        }
-    }
-
+                    
     private void updatePauseMenu() {
         if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
             currentPauseMenuItemHovered++;
@@ -546,31 +620,28 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
     private void handleAttackCollision1() {
         int damage = 10;
-
         player2.damagePlayer(damage);
-
-        int newHealth = player2.getPlayerHealth();
-
-        if (player2.getPlayerHealth() == 10) {
+    
+        // Debug output to confirm damage and health status
+        System.out.println("Player 2 damaged! New health: " + player2.getPlayerHealth());
+    
+        // Check if player2's health is zero or below to trigger a loss
+        if (player2.getPlayerHealth() <= 1) {
             onDeath(); // Trigger level lose
-        } else {
-            System.out.println("Player 2 damaged! New health: " + player2.getPlayerHealth());
         }
     }
-
+    
     private void handleAttackCollision2() {
         int damage = 10;
-
         player.damagePlayer(damage);
-
-        int newHealth = player.getPlayerHealth();
-
-        if (player.getPlayerHealth() == 10) {
-            onDeath();
-        } else {
-
-            System.out.println("Player 1 damaged! New health: " + player.getPlayerHealth());
+    
+        // Debug output to confirm damage and health status
+        System.out.println("Player 1 damaged! New health: " + player.getPlayerHealth());
+    
+        // Check if player's health is zero or below to trigger a loss
+        if (player.getPlayerHealth() <= 1) {
+            onDeath(); // Trigger level lose
         }
     }
-
+    
 }
