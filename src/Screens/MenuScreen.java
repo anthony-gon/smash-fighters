@@ -3,10 +3,7 @@ package Screens;
 import Engine.*;
 import Game.GameState;
 import Game.ScreenCoordinator;
-import Level.Map;
-import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
-import Players.Knight;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -16,18 +13,18 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class MenuScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
-    protected int currentMenuItemHovered = 0; // Current menu item being "hovered" over
+    protected int currentMenuItemHovered = 0;
     protected int menuItemSelected = -1;
     protected SpriteFont playGame;
     protected SpriteFont credits;
-    protected SpriteFont practiceRange; // New sprite font for Practice Range
-    protected SpriteFont howToPlay; // New sprite font for How To Play
-    protected SpriteFont gameTitle; // Title of the game "Smash Fighters"
-    protected List<SpriteFont> menuItems; // List to hold all menu items
-    protected Map background;
+    protected SpriteFont practiceRange;
+    protected SpriteFont howToPlay;
+    protected SpriteFont gameTitle;
+    protected List<SpriteFont> menuItems;
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
     protected int pointerOffsetX = 30;
@@ -39,11 +36,24 @@ public class MenuScreen extends Screen {
     protected int titleSizeChange = 1;
     protected int minTitleSize = 35;
     protected int maxTitleSize = 50;
-    protected int titleSizeChangeDelay = 0; // Delay counter for size change
-    protected int titleSizeChangeDelayMax = 5; // Max delay before size change
+    protected int titleSizeChangeDelay = 0;
+    protected int titleSizeChangeDelayMax = 5;
 
     // Sound properties for background music
     protected Clip musicClip;
+
+    // Lightning bolt effect variables
+    private long lastLightningStrikeTime;
+    private boolean lightningVisible = false;
+    private static final int LIGHTNING_INTERVAL = 1000; // 1 second for frequent strikes
+    private static final int LIGHTNING_DURATION = 300; // 0.3 seconds for visible duration
+    private Random random = new Random();
+
+    // Variables to store random lightning path
+    private int lightningStartX;
+    private int lightningEndX;
+    private int[] lightningPathX;
+    private int[] lightningPathY;
 
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -51,7 +61,6 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        // Initialize the menu items
         playGame = new SpriteFont("PLAY GAME", 300, 150, "fibberish", 30, new Color(49, 207, 240));
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
@@ -68,28 +77,21 @@ public class MenuScreen extends Screen {
         credits.setOutlineColor(Color.black);
         credits.setOutlineThickness(3);
 
-        // Add items to the menuItems list in the correct order
         menuItems = Arrays.asList(playGame, practiceRange, howToPlay, credits);
 
-        // Initialize the game title "Smash Fighters" in the top right corner
-        gameTitle = new SpriteFont("SMASH FIGHTERS", 100, 50, "fibberish", titleSize, new Color(255, 69, 0));
+        gameTitle = new SpriteFont("SMASH FIGHTERS", 100, 50, "fibberish", titleSize, new Color(255, 0, 0));
         gameTitle.setOutlineColor(Color.black);
         gameTitle.setOutlineThickness(5);
 
-        background = new TitleScreenMap();
-        background.setAdjustCamera(false);
         keyPressTimer = 0;
         menuItemSelected = -1;
         keyLocker.lockKey(Key.SPACE);
 
-        // Load and play background music using the direct path
+        lastLightningStrikeTime = System.currentTimeMillis();
         playBackgroundMusic();
     }
 
     public void update() {
-        // Update background map (to play tile animations)
-        background.update(null);
-        // Change menu item "hovered" over
         if (Keyboard.isKeyDown(Key.DOWN) && keyPressTimer == 0) {
             keyPressTimer = 14;
             currentMenuItemHovered++;
@@ -102,93 +104,134 @@ public class MenuScreen extends Screen {
             }
         }
 
-        // Loop the selection back around
         if (currentMenuItemHovered >= menuItems.size()) {
             currentMenuItemHovered = 0;
         } else if (currentMenuItemHovered < 0) {
             currentMenuItemHovered = menuItems.size() - 1;
         }
 
-        // Update pointer location
         updatePointerLocation();
 
-        // Handle selection
         if (Keyboard.isKeyUp(Key.SPACE)) {
             keyLocker.unlockKey(Key.SPACE);
         }
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
             menuItemSelected = currentMenuItemHovered;
-            stopBackgroundMusic(); // Stop the music before transitioning
+            stopBackgroundMusic();
             if (menuItemSelected == 0) {
                 screenCoordinator.setGameState(GameState.MAP_SELECT);
-            } else if (menuItemSelected == 1) { // If Practice Range is selected
+            } else if (menuItemSelected == 1) {
                 screenCoordinator.setGameState(GameState.PRACTICE_RANGE);
-            } else if (menuItemSelected == 2) { // If How to Play is selected
+            } else if (menuItemSelected == 2) {
                 screenCoordinator.setGameState(GameState.HOW_TO_PLAY);
-            } else if (menuItemSelected == 3) { // If Credits is selected
+            } else if (menuItemSelected == 3) {
                 screenCoordinator.setGameState(GameState.CREDITS);
             }
         }
 
-        // Update the size of the title to oscillate between min and max sizes
         updateTitleSize();
+        updateLightningEffect();
     }
 
     public void updatePointerLocation() {
-        // Loop over menuItems to set their colors and determine pointer location
         for (int i = 0; i < menuItems.size(); i++) {
             if (i == currentMenuItemHovered) {
-                menuItems.get(i).setColor(new Color(255, 215, 0)); // Highlighted color
-                // Set pointer location based on the current hovered item
+                menuItems.get(i).setColor(new Color(255, 215, 0));
                 pointerLocationX = (int) (menuItems.get(i).getX() - pointerOffsetX);
                 pointerLocationY = (int) (menuItems.get(i).getY() - pointerOffsetY);
             } else {
-                menuItems.get(i).setColor(new Color(49, 207, 240)); // Default color
+                menuItems.get(i).setColor(new Color(49, 207, 240));
             }
         }
     }
 
-    // Update title size to make it oscillate back and forth
     public void updateTitleSize() {
-        // Increment the delay counter
         if (titleSizeChangeDelay >= titleSizeChangeDelayMax) {
-            // Change the size of the title
             titleSize += titleSizeChange;
-
-            // Check bounds and reverse direction if needed
             if (titleSize >= maxTitleSize || titleSize <= minTitleSize) {
                 titleSizeChange *= -1;
             }
-
-            // Update the title font size
             gameTitle.setFontSize(titleSize);
-
-            // Reset the delay counter
             titleSizeChangeDelay = 0;
         } else {
-            // Increment the delay counter to slow down size change
             titleSizeChangeDelay++;
         }
     }
 
+    private void updateLightningEffect() {
+        long currentTime = System.currentTimeMillis();
+
+        // Check if it's time for a lightning strike
+        if (currentTime - lastLightningStrikeTime >= LIGHTNING_INTERVAL) {
+            generateRandomLightningPath();
+            lightningVisible = true;
+            lastLightningStrikeTime = currentTime;
+        }
+
+        // Hide lightning after a short duration
+        if (lightningVisible && currentTime - lastLightningStrikeTime >= LIGHTNING_DURATION) {
+            lightningVisible = false;
+        }
+    }
+
+    private void generateRandomLightningPath() {
+        int screenWidth = ScreenManager.getScreenWidth();
+        int screenHeight = ScreenManager.getScreenHeight();
+
+        // Randomize starting and ending X positions within screen bounds
+        lightningStartX = random.nextInt(screenWidth / 2) + screenWidth / 4; // Start roughly in the middle
+        lightningEndX = random.nextInt(screenWidth / 2) + screenWidth / 4;
+
+        // Generate a random jagged path between the start and end points
+        int segments = 5 + random.nextInt(3); // Randomize number of segments
+        lightningPathX = new int[segments + 2];
+        lightningPathY = new int[segments + 2];
+
+        lightningPathX[0] = lightningStartX;
+        lightningPathY[0] = 0; // Start from the top
+
+        for (int i = 1; i <= segments; i++) {
+            lightningPathX[i] = lightningPathX[i - 1] + random.nextInt(100) - 50; // Randomize horizontal displacement
+            lightningPathY[i] = lightningPathY[i - 1] + screenHeight / (segments + 1); // Spread evenly vertically
+        }
+
+        lightningPathX[segments + 1] = lightningEndX;
+        lightningPathY[segments + 1] = screenHeight; // End at the bottom
+    }
+
+    @Override
     public void draw(GraphicsHandler graphicsHandler) {
-        background.draw(graphicsHandler);
-        // Draw the title
+        graphicsHandler.drawFilledRectangle(0, 0, ScreenManager.getScreenWidth(), ScreenManager.getScreenHeight(), Color.black);
+        
         gameTitle.draw(graphicsHandler);
-        // Draw each menu item
         for (SpriteFont menuItem : menuItems) {
             menuItem.draw(graphicsHandler);
         }
-        // Draw the pointer
+        
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20,
                 new Color(49, 207, 240), Color.black, 2);
+
+        // Draw lightning effect if visible
+        if (lightningVisible) {
+            drawLightningBolt(graphicsHandler);
+        }
     }
 
-    // Method to load and play background music
+    private void drawLightningBolt(GraphicsHandler graphicsHandler) {
+        Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
+
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(6)); // Thicker stroke for bigger lightning
+
+        // Draw the lightning path
+        for (int i = 0; i < lightningPathX.length - 1; i++) {
+            g2d.drawLine(lightningPathX[i], lightningPathY[i], lightningPathX[i + 1], lightningPathY[i + 1]);
+        }
+    }
+
     private void playBackgroundMusic() {
         try {
-            // Use a direct file path for testing
-            String filePath = "Resources/MenuMusic.wav"; // Replace with the correct relative or absolute path
+            String filePath = "Resources/MenuMusic.wav";
             File soundFile = new File(filePath);
 
             if (!soundFile.exists()) {
@@ -196,25 +239,20 @@ public class MenuScreen extends Screen {
                 return;
             }
 
-            // Load audio input stream
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
             musicClip = AudioSystem.getClip();
             musicClip.open(audioInputStream);
 
-            // Optionally set the volume to a desired level
             FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
-            volumeControl.setValue(volumeControl.getMaximum()); // Max volume
+            volumeControl.setValue(volumeControl.getMaximum());
 
-            // Play music in a loop
             musicClip.loop(Clip.LOOP_CONTINUOUSLY);
-            System.out.println("Music clip started? " + musicClip.isRunning());
         } catch (Exception e) {
             System.err.println("Error loading or playing background music: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Method to stop the background music
     private void stopBackgroundMusic() {
         if (musicClip != null && musicClip.isRunning()) {
             musicClip.stop();
