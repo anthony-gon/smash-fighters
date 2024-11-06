@@ -17,6 +17,7 @@ import java.awt.Color; // Add this line
 public class Knight extends Player {
         private Rectangle hitbox;
         private Rectangle attackHitbox;
+        protected Boolean isAttacking = false;
         protected long attackboxTimer = System.currentTimeMillis();
 
         public Knight(float x, float y) {
