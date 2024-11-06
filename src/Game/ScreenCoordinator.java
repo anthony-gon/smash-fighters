@@ -14,6 +14,7 @@ import Screens.HowToPlayScreen;
 import Screens.IntroScreen;
 import Screens.MapSelectScreen;
 import Screens.CharacterScreen;
+import Screens.Countdown;
 
 // Based on the current game state, this class determines which Screen should be shown.
 public class ScreenCoordinator extends Screen {
@@ -85,6 +86,10 @@ public class ScreenCoordinator extends Screen {
                     characterScreen = new CharacterScreen(this);
                     currentScreen = characterScreen;
                     break;  
+                case COUNTDOWN:
+                    // Set the current screen to the Countdown screen instead of CharacterScreen
+                    currentScreen = new Countdown(this);
+                    break;
                 case LEVEL:
                     currentScreen = new PlayLevelScreen(this);
                     break;

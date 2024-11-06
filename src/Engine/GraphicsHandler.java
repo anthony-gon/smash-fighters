@@ -147,4 +147,9 @@ public class GraphicsHandler {
         // Restore the original transform after scaling
         g.setTransform(oldTransform);
     }
+
+    public void translate(int xShakeOffset, int yShakeOffset) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'translate'");
+    }
 }

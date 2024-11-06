@@ -196,7 +196,7 @@ public class CharacterScreen extends Screen {
             }
 
             // Move to the game after Player 2 has selected their character
-            screenCoordinator.setGameState(GameState.LEVEL);
+            screenCoordinator.setGameState(GameState.COUNTDOWN);
             System.out.println("Player 2 selected: " + selectedCharacterP2);
         }
     }
