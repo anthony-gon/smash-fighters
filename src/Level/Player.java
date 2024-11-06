@@ -20,6 +20,9 @@ public abstract class Player extends GameObject {
     protected float terminalVelocityY = 0;
     protected float momentumYIncrease = 0;
     protected int playerHealth = 100;
+
+    protected int kbTimer = 0;
+
     long lastDamage = System.currentTimeMillis();
 
     // values used to handle player movement
@@ -74,6 +77,9 @@ public abstract class Player extends GameObject {
 
     public void damagePlayer(int damage) {
         this.playerHealth -= damage;
+    }
+
+    public void playerCastHitbox(int hitBox) {
 
     }
 
@@ -284,6 +290,46 @@ public abstract class Player extends GameObject {
         momentumY += momentumYIncrease;
         if (momentumY > terminalVelocityY) {
             momentumY = terminalVelocityY;
+        }
+    }
+
+    public boolean applyKnockbackLeft() {
+
+        // Defines the amount of frames a kb will last
+        int kbVariance = 15;
+
+        kbTimer += 1;
+        System.out.println(kbTimer);
+        if (kbTimer <= kbVariance) {
+            if (kbTimer % 1 == 0) {
+                this.x = this.x - (kbVariance / 3 - kbTimer / 3);
+                return true;
+            } else {
+                return true;
+            }
+        } else {
+            kbTimer = 0;
+            return false;
+        }
+    }
+
+    public boolean applyKnockbackRight() {
+
+        // Defines the amount of frames a kb will last
+        int kbVariance = 15;
+
+        kbTimer += 1;
+        System.out.println(kbTimer);
+        if (kbTimer <= kbVariance) {
+            if (kbTimer % 1 == 0) {
+                this.x = this.x + (kbVariance / 3 - kbTimer / 3);
+                return true;
+            } else {
+                return true;
+            }
+        } else {
+            kbTimer = 0;
+            return false;
         }
     }
 

@@ -1,5 +1,6 @@
 package Screens;
 
+import java.util.random.*;
 import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
@@ -28,6 +29,9 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import GameObject.Rectangle;
+import Utils.Direction;
+import Level.PlayerState;
 
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
@@ -40,6 +44,32 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
     protected HealthBar playerOneHB;
     protected HealthBar playerTwoHB;
+
+    protected String[] characters = { "Brawler", "Knight", "Gunner" };
+    protected String playerOneChar; // Stores what type of player player one is for hitbox purposes
+    protected String playerTwoChar; // Stores what type of player player two is for hitbox purposes
+
+    protected int playerOneHurtTimer = 0;
+    protected int playerTwoHurtTimer = 0;
+
+    protected int playerOneHurtDelay = 0;
+    protected float playerTwoHurtDelay = 0;
+
+    protected boolean kbPlayerTwoLeft = false;
+    protected boolean kbPlayerTwoRight = false;
+
+    protected boolean kbPlayerOneLeft = false;
+    protected boolean kbPlayerOneRight = false;
+
+    protected KeyLocker keyLocker2 = new KeyLocker();
+    protected float playerOneTimerTwo = System.currentTimeMillis();
+    protected float playerTwoTimerTwo = System.currentTimeMillis();
+
+    protected int playerOneHitTimer = 0;
+    protected int playerTwoHitTimer = 0;
+
+    protected boolean playerOneAttackStarted = false;
+    protected boolean playerTwoAttackStarted = false;
 
     protected PlayLevelScreenState playLevelScreenState;
     protected int screenTimer;
@@ -92,22 +122,30 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Setup player 1 based on the selected character
         if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.BRAWLER) {
             this.player = new Brawler(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            playerOneChar = characters[0];
         } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
             this.player = new Knight(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            playerOneChar = characters[1];
         } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.GUNNER) {
             this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            playerOneChar = characters[2];
         }
         int player2OffsetX = 430;
         // Setup player 2 based on the selected character
         if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
             this.player2 = new Brawler2(map.getPlayerStartPosition().x + player2OffsetX,
                     map.getPlayerStartPosition().y); // Player 2
+            playerTwoChar = characters[0];
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
             this.player2 = new Knight2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
                                                                                                                          // 2
+            playerTwoChar = characters[1];
+
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.GUNNER) {
             this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
                                                                                                                        // 2
+            playerTwoChar = characters[2];
+
         }
 
         // **Assign movement keys for Player 2 (JIKL)**
@@ -122,8 +160,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         levelClearedScreen = new LevelClearedScreen();
         levelLoseScreen = new LevelLoseScreen(this, attackProcessed);
 
-        
-
         this.playLevelScreenState = PlayLevelScreenState.RUNNING;
 
         resumeOption = new SpriteFont("RESUME", 300, 200, "fibberish", 30, new Color(49, 207, 240));
@@ -134,6 +170,88 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Play the background music when the PlayLevelScreen starts
         playBackgroundMusic();
     }
+
+    // Used to calculate the offset and position of each players hit box
+    // Returns Rectangle of where the hitbox should be
+    public Rectangle playerOneHitboxPos() {
+        if (playerOneChar == characters[0]) {
+            return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
+        } else if (playerOneChar == characters[1]) {
+            return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
+        }
+        return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
+    }
+
+    public Rectangle playerTwoHitboxPos() {
+        if (playerTwoChar == characters[0]) {
+            return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
+        } else if (playerTwoChar == characters[1]) {
+            return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
+        }
+        return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
+    }
+
+    public Rectangle playerOneHurtBox() {
+        if (playerOneChar == characters[0]) {
+            if (player.getFacingDirection() == Direction.LEFT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() - 5, (int) player.getY() + 25, 15, 15);
+                }
+            } else if (player.getFacingDirection() == Direction.RIGHT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() + 60, (int) player.getY() + 25, 15, 15);
+                }
+            }
+        }
+        return new Rectangle();
+    }
+
+    public Rectangle playerTwoHurtBox() {
+        if (playerTwoChar == characters[0]) {
+            if (player2.getFacingDirection() == Direction.LEFT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() - 5, (int) player2.getY() + 25, 15, 15);
+                }
+            } else if (player2.getFacingDirection() == Direction.RIGHT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() + 60, (int) player2.getY() + 25, 15, 15);
+                }
+            }
+        }
+        return new Rectangle();
+
+    }
+
+    public void playerOneHitDetection() {
+        playerOneHurtTimer += 1;
+        if (playerOneHurtTimer > 15) {
+            if (playerOneHurtBox().intersects(playerTwoHitboxPos())) {
+                player2.damagePlayer(10);
+                playerOneHurtTimer = 0;
+                if (player.getX() > player2.getX()) {
+                    kbPlayerTwoLeft = true;
+                } else {
+                    kbPlayerTwoRight = true;
+                }
+            }
+        }
+    }
+
+    public void playerTwoHitDetection() {
+        playerTwoHurtTimer += 1;
+        if (playerTwoHurtTimer > 15) {
+            if (playerTwoHurtBox().intersects(playerOneHitboxPos())) {
+                playerTwoHurtTimer = 0;
+                player.damagePlayer(10);
+                if (player.getX() < player2.getX()) {
+                    kbPlayerOneLeft = true;
+                } else {
+                    kbPlayerOneRight = true;
+                }
+            }
+        }
+    }
+
     @Override
     public void update() {
         // Handle pause input with the ESCAPE key
@@ -147,20 +265,19 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             }
             keyLocker.lockKey(Key.ESC);
         }
-    
+
         if (Keyboard.isKeyUp(Key.ESC)) {
             keyLocker.unlockKey(Key.ESC);
         }
-    
+
         switch (playLevelScreenState) {
             case RUNNING:
                 try {
                     player.update(); // Player 1
                     player2.update(); // Player 2
-    
+
                     // Check each player combination for attack collisions
-                    checkAttackCollisions();
-    
+
                     // Determine if any player has lost all health and set the winner
                     if (player2.getPlayerHealth() <= 0) {
                         isPlayer1Winner = true;
@@ -173,14 +290,14 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                         levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
                         stopBackgroundMusic();
                     }
-                    
+
                     map.update(player);
                     map.update(player2);
                 } catch (NullPointerException e) {
                     System.err.println("Error updating player: " + e.getMessage());
                 }
                 break;
-    
+
             case LEVEL_COMPLETED:
                 if (levelCompletedStateChangeStart) {
                     screenTimer = 130;
@@ -193,273 +310,18 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     }
                 }
                 break;
-    
+
             case LEVEL_LOSE:
                 stopBackgroundMusic(); // Stop music when the player dies
                 levelLoseScreen.update();
                 break;
-    
+
             case PAUSED:
                 updatePauseMenu();
                 break;
         }
     }
-    
-    private void checkAttackCollisions() {
-        if (player instanceof Knight && player2 instanceof Knight2) {
-            Knight knight1 = (Knight) player;
-            Knight2 knight2 = (Knight2) player2;
-    
-            if (!attackProcessed) { // Only check if not processed
-                if (knight1.getAttackHitbox().intersects(knight2.getHitbox())) {
-                    handleAttackCollision1();
-                    attackProcessed = true; // Mark as processed
-                }
-                if (knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                    handleAttackCollision2();
-                    attackProcessed = true; // Mark as processed
-                }
-            }
-    
-            // Reset attackProcessed flag if the hitboxes are no longer intersecting
-            if (!knight1.getAttackHitbox().intersects(knight2.getHitbox()) &&
-                    !knight2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                attackProcessed = false; // Reset if no longer colliding
-            }
-        }
-    
-        // Other combinations for Brawler, Mage, etc.
-        // Repeat the same structure as above for other player types
-        // Example for Brawler vs. Brawler2 and other classes
-        // ...
-    
-    
 
-                    if (player instanceof Brawler && player2 instanceof Brawler2) {
-                        Brawler brawler1 = (Brawler) player;
-                        Brawler2 brawler2 = (Brawler2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (brawler1.getAttackHitbox().intersects(brawler2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (brawler2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
-                                !brawler2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Mage && player2 instanceof Mage2) {
-                        Mage mage1 = (Mage) player;
-                        Mage2 mage2 = (Mage2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (mage1.getAttackHitbox().intersects(mage2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (mage1.getAttackHitbox().intersects(mage2.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(mage2.getHitbox()) &&
-                                !mage2.getAttackHitbox().intersects(mage1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Knight && player2 instanceof Mage2) {
-                        Knight knight1 = (Knight) player;
-                        Mage2 mage2 = (Mage2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (knight1.getAttackHitbox().intersects(mage2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (mage2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(mage2.getHitbox()) &&
-                                !mage2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Knight && player2 instanceof Brawler2) {
-                        Knight knight1 = (Knight) player;
-                        Brawler2 brawler2 = (Brawler2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (knight1.getAttackHitbox().intersects(brawler2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (brawler2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!knight1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
-                                !brawler2.getAttackHitbox().intersects(knight1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Mage && player2 instanceof Knight2) {
-                        Mage mage1 = (Mage) player;
-                        Knight2 knight2 = (Knight2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (mage1.getAttackHitbox().intersects(knight2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (knight2.getAttackHitbox().intersects(mage1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(knight2.getHitbox()) &&
-                                !knight2.getAttackHitbox().intersects(mage1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Mage && player2 instanceof Brawler2) {
-                        Mage mage1 = (Mage) player;
-                        Brawler2 brawler2 = (Brawler2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (mage1.getAttackHitbox().intersects(brawler2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (brawler2.getAttackHitbox().intersects(mage1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!mage1.getAttackHitbox().intersects(brawler2.getHitbox()) &&
-                                !brawler2.getAttackHitbox().intersects(mage1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Brawler && player2 instanceof Knight2) {
-                        Brawler brawler1 = (Brawler) player;
-                        Knight2 knight2 = (Knight2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (brawler1.getAttackHitbox().intersects(knight2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (knight2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(knight2.getHitbox()) &&
-                                !knight2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-
-                    if (player instanceof Brawler && player2 instanceof Mage2) {
-                        Brawler brawler1 = (Brawler) player;
-                        Mage2 mage2 = (Mage2) player2;
-
-                        if (!attackProcessed) { // Only check if not processed
-                            if (brawler1.getAttackHitbox().intersects(mage2.getHitbox())) {
-                                handleAttackCollision1();
-                                attackProcessed = true; // Mark as processed
-                            }
-                            if (mage2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                                handleAttackCollision2();
-                                attackProcessed = true; // Mark as processed
-                            }
-                        }
-
-                        // Reset attackProcessed flag if the hitboxes are no longer intersecting
-                        if (!brawler1.getAttackHitbox().intersects(mage2.getHitbox()) &&
-                                !mage2.getAttackHitbox().intersects(brawler1.getHitbox())) {
-                            attackProcessed = false; // Reset if no longer colliding
-                        }
-                    }
-                
-                   
-                        switch (playLevelScreenState) {
-                            case RUNNING:
-                                if (!gameOver) { // Only run this logic if the game is not over
-                                    try {
-                                        player.update(); // Player 1
-                                        player2.update(); // Player 2
-                
-                                      
-                
-                                        // Determine if any player has lost all health and set the winner
-                                        if (player2.getPlayerHealth() <= 0) {
-                                            isPlayer1Winner = true;  // Player 1 wins
-                                            gameOver = true;         // Set gameOver to true to prevent re-triggering
-                                            System.out.println("Player 1 wins! Setting isPlayer1Winner to " + isPlayer1Winner);
-                                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);  // Pass the correct flag
-                                            stopBackgroundMusic();
-                                        } else if (player.getPlayerHealth() <= 0) {
-                                            isPlayer1Winner = false;  // Player 2 wins
-                                            gameOver = true;          // Set gameOver to true to prevent re-triggering
-                                            System.out.println("Player 2 wins! Setting isPlayer1Winner to " + isPlayer1Winner);
-                                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);  // Pass the correct flag
-                                            stopBackgroundMusic();
-                                        }
-                
-                                        map.update(player);
-                                        map.update(player2);
-                                    } catch (NullPointerException e) {
-                                        System.err.println("Error updating player: " + e.getMessage());
-                                    }
-                                }
-                                break;
-                
-                            case LEVEL_LOSE:
-                                levelLoseScreen.update();
-                                break;
-                
-                            case LEVEL_COMPLETED:
-                                // Handle level completed logic...
-                                break;
-                
-                            case PAUSED:
-                                updatePauseMenu();
-                                break;
-                        }
-                    }
-                    
     private void updatePauseMenu() {
         if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
             currentPauseMenuItemHovered++;
@@ -509,10 +371,47 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 player.draw(graphicsHandler); // Draw Player 1
                 player2.draw(graphicsHandler); // Draw Player 2
 
+                // playerOneHitboxPos().draw(graphicsHandler);
+                // playerTwoHitboxPos().draw(graphicsHandler);
+
+                playerOneHitboxPos();
+                playerTwoHitboxPos();
+
+                playerOneHurtBox().draw(graphicsHandler);
+                playerTwoHurtBox();
+
+                playerOneHitDetection();
+                playerTwoHitDetection();
+
+                if (kbPlayerTwoLeft == true) {
+                    System.out.println("should kb");
+                    if (player2.applyKnockbackLeft() == false) {
+                        kbPlayerTwoLeft = false;
+                    }
+                } else if (kbPlayerTwoRight == true) {
+                    System.out.println("should kb");
+                    if (player2.applyKnockbackRight() == false) {
+                        kbPlayerTwoRight = false;
+                    }
+
+                }
+                if (kbPlayerOneLeft == true) {
+                    System.out.println("should kb");
+                    if (player.applyKnockbackLeft() == false) {
+                        kbPlayerOneLeft = false;
+                    }
+                } else if (kbPlayerOneRight == true) {
+                    System.out.println("should kb");
+                    if (player.applyKnockbackRight() == false) {
+                        kbPlayerOneRight = false;
+                    }
+
+                }
+
                 playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
                 playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
 
-                // Draw Second Health Bar Here
+                // Draw Second Health Bar Herea
 
                 // Draw health bar
 
@@ -618,30 +517,4 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         RUNNING, LEVEL_COMPLETED, LEVEL_LOSE, PAUSED
     }
 
-    private void handleAttackCollision1() {
-        int damage = 10;
-        player2.damagePlayer(damage);
-    
-        // Debug output to confirm damage and health status
-        System.out.println("Player 2 damaged! New health: " + player2.getPlayerHealth());
-    
-        // Check if player2's health is zero or below to trigger a loss
-        if (player2.getPlayerHealth() <= 1) {
-            onDeath(); // Trigger level lose
-        }
-    }
-    
-    private void handleAttackCollision2() {
-        int damage = 10;
-        player.damagePlayer(damage);
-    
-        // Debug output to confirm damage and health status
-        System.out.println("Player 1 damaged! New health: " + player.getPlayerHealth());
-    
-        // Check if player's health is zero or below to trigger a loss
-        if (player.getPlayerHealth() <= 1) {
-            onDeath(); // Trigger level lose
-        }
-    }
-    
 }
