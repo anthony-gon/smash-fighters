@@ -1,6 +1,5 @@
 package Screens;
 
-import java.util.random.*;
 import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
@@ -8,10 +7,12 @@ import Engine.Keyboard;
 import Engine.Screen;
 import Game.GameState;
 import Game.ScreenCoordinator;
+import GameObject.Rectangle;
 import Level.HealthBar;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
+import Level.PlayerState;
 import Maps.Map2;
 import Maps.ToadsMap;
 import Players.Brawler;
@@ -21,6 +22,7 @@ import Players.Knight2;
 import Players.Mage;
 import Players.Mage2;
 import SpriteFont.SpriteFont;
+import Utils.Direction;
 import java.awt.Color;
 import java.io.File;
 import java.util.Arrays;
@@ -29,9 +31,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import GameObject.Rectangle;
-import Utils.Direction;
-import Level.PlayerState;
 
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
@@ -280,16 +279,36 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
                     // Determine if any player has lost all health and set the winner
                     if (player2.getPlayerHealth() <= 0) {
-                        isPlayer1Winner = true;
-                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
-                        stopBackgroundMusic();
+                        kbPlayerTwoLeft = false;
+                        kbPlayerTwoRight = false;
+                        player2.removeLives(1);
+                        player2.setLocation(map.getPlayerStartPosition().x + 410, map.getPlayerStartPosition().y);
+
+                        if (player2.getPlayerLives() > 0) {
+                            player2.resetHealth(100);
+                        }
+                        else {
+                            isPlayer1Winner = true;
+                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                            stopBackgroundMusic();
+                        }
                     } else if (player.getPlayerHealth() <= 0) {
-                        isPlayer1Winner = false;
-                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
-                        stopBackgroundMusic();
+                        kbPlayerOneLeft = false;
+                        kbPlayerOneRight = false;
+                        player.removeLives(1);
+                        player.setLocation(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+
+                        if (player.getPlayerLives() > 0) {
+                            player.resetHealth(100);
+                        }
+                        else {
+                            isPlayer1Winner = false;
+                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                            stopBackgroundMusic();
                     }
+                }
 
                     map.update(player);
                     map.update(player2);

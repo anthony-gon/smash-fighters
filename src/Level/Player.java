@@ -7,7 +7,7 @@ import GameObject.GameObject;
 import GameObject.SpriteSheet;
 import Utils.AirGroundState;
 import Utils.Direction;
-
+import Utils.Point;
 import java.util.ArrayList;
 
 public abstract class Player extends GameObject {
@@ -20,6 +20,7 @@ public abstract class Player extends GameObject {
     protected float terminalVelocityY = 0;
     protected float momentumYIncrease = 0;
     protected int playerHealth = 100;
+    protected int playerLives = 3;
 
     protected int kbTimer = 0;
 
@@ -75,10 +76,31 @@ public abstract class Player extends GameObject {
         return this.playerHealth;
     }
 
+    public int getPlayerLives() {
+        return this.playerLives;
+    }
+ 
+
     public void damagePlayer(int damage) {
         this.playerHealth -= damage;
     }
 
+
+    public void resetHealth(int extraHealth) {
+        this.playerHealth += extraHealth;
+    }
+
+
+    public void removeLives(int lives) {
+        this.playerLives -= lives;
+    }
+
+    public void setLocation(Point newPosition) {
+        this.setX(x);
+        this.setY(y); 
+    }
+
+    
     public void playerCastHitbox(int hitBox) {
 
     }
