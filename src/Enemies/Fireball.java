@@ -22,10 +22,10 @@ public class Fireball extends Enemy {
 
     public Fireball(Point location, float movementSpeed, int existenceFrames) {
         super(location.x, location.y, new SpriteSheet(ImageLoader.load("Fireball.png"), 7, 7), "DEFAULT");
-        this.movementSpeed = movementSpeed;
+        this.movementSpeed = movementSpeed + 1;
 
         // how long the fireball will exist for before disappearing
-        this.existenceFrames = existenceFrames;
+        this.existenceFrames = existenceFrames + 180;
 
         initialize();
     }
