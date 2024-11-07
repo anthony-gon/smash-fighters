@@ -9,6 +9,7 @@ import Game.GameState;
 import Game.ScreenCoordinator;
 import GameObject.Rectangle;
 import Level.HealthBar;
+import Level.LivesDisplay;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
@@ -43,6 +44,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
     protected HealthBar playerOneHB;
     protected HealthBar playerTwoHB;
+
+    protected LivesDisplay playerOneL;
+    protected LivesDisplay playerTwoL;
 
     protected String[] characters = { "Brawler", "Knight", "Gunner" };
     protected String playerOneChar; // Stores what type of player player one is for hitbox purposes
@@ -110,6 +114,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.playerTwoHB = new HealthBar(1, 100, 100);
         playerOneHB.loadHealthBars();
         playerTwoHB.loadHealthBars();
+
+        this.playerOneL = new LivesDisplay(0, 3, 3);
+        this.playerTwoL = new LivesDisplay(1, 3, 3);
+        playerOneL.loadLives();
+        playerTwoL.loadLives();
 
         // Initialize map based on selected map name
         if (selectedMapName.equals("Inferno")) {
@@ -427,6 +436,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
                 playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
                 playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
+
+                playerOneL.draw(graphicsHandler, player.getPlayerLives());
+                playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
                 // Draw Second Health Bar Herea
 
