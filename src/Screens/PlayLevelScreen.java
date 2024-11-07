@@ -286,8 +286,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
                         if (player2.getPlayerLives() > 0) {
                             player2.resetHealth(100);
-                        }
-                        else {
+                        } else {
                             isPlayer1Winner = true;
                             playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
                             levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
@@ -301,14 +300,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
                         if (player.getPlayerLives() > 0) {
                             player.resetHealth(100);
-                        }
-                        else {
+                        } else {
                             isPlayer1Winner = false;
                             playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
                             levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
                             stopBackgroundMusic();
+                        }
                     }
-                }
 
                     map.update(player);
                     map.update(player2);
@@ -396,7 +394,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 playerOneHitboxPos();
                 playerTwoHitboxPos();
 
-                playerOneHurtBox().draw(graphicsHandler);
+                playerOneHurtBox();
                 playerTwoHurtBox();
 
                 playerOneHitDetection();
