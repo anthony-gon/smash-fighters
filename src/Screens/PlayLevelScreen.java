@@ -156,6 +156,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         }
 
+        this.player2.setFacingDirection(Direction.LEFT);
+
         // **Assign movement keys for Player 2 (JIKL)**
         player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
 
