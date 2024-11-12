@@ -152,4 +152,19 @@ public class GraphicsHandler {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'translate'");
     }
+
+    public void drawCenteredText(String countdownText, int x, int y, Color red, int i) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'drawCenteredText'");
+    }
+
+    public void setColor(Color red) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setColor'");
+    }
+
+    public void setFont(Font font) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setFont'");
+    }
 }
