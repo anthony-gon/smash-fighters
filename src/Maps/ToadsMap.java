@@ -7,12 +7,9 @@ import EnhancedMapTiles.EndLevelBox;
 import EnhancedMapTiles.HorizontalMovingPlatform;
 import GameObject.Rectangle;
 import Level.*;
-import NPCs.Walrus;
-import Tilesets.CommonTileset;
 import Tilesets.ToadsTileset;
 import Utils.Direction;
 import Utils.Point;
-
 import java.util.ArrayList;
 
 // Represents the ToadsMap to be used in a level
@@ -21,7 +18,7 @@ public class ToadsMap extends Map {
     public ToadsMap() {
         super("toadsmap.txt", new ToadsTileset());
         // Set player start position, make sure these coordinates are valid for the map
-        this.playerStartPosition = new Point(100, 100);
+        this.playerStartPosition = new Point(135, 100);
     }
 
     @Override

@@ -123,7 +123,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Initialize map based on selected map name
         if (selectedMapName.equals("Inferno")) {
             this.map = new ToadsMap();
-        } else if (selectedMapName.equals("Ice Kingdom")) {
+        } else if (selectedMapName.equals("Tundra")) {
             this.map = new Map2();
         }
 
@@ -155,6 +155,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             playerTwoChar = characters[2];
 
         }
+
+        this.player2.setFacingDirection(Direction.LEFT);
 
         // **Assign movement keys for Player 2 (JIKL)**
         player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
