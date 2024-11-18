@@ -20,7 +20,7 @@ public class Brawler2 extends Player {
         protected long attackboxTimer = System.currentTimeMillis();
 
         public Brawler2(float x, float y) {
-                super(new SpriteSheet(ImageLoader.load("BrawlerBlue.png"), 24, 24), x, y, "STAND_RIGHT");
+                super(new SpriteSheet(ImageLoader.load("Brawler.png"), 24, 24), x, y, "STAND_RIGHT");
                 gravity = .5f;
                 terminalVelocityY = 6f;
                 jumpHeight = 14.5f;
