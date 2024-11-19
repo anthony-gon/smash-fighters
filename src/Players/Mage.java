@@ -153,7 +153,7 @@ public class Mage extends Player {
             } else {
                 fireballX = Math.round(getX() - 21);
                 fireballX = fireballX + 20;
-                movementSpeed = -1.5f;
+                movementSpeed = -3.5f;
             }
 
             int fireballY = Math.round(getY()) + 4;
