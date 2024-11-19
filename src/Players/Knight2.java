@@ -51,7 +51,7 @@ public class Knight2 extends Player {
 
         // Load sounds
         
-        loadSound("Resources/TestSound.wav", "attack"); // Update with actual path for attack sound
+        loadSound("Resources/Satk2.wav", "attack"); // Update with actual path for attack sound
         loadSound("Resources/TestSound.wav", "death");   // Update with actual path for death sound
     }
 
