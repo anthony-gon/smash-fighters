@@ -251,6 +251,44 @@ public abstract class Player extends GameObject {
             keyLocker.lockKey(JUMP_KEY);
             playerState = PlayerState.JUMPING;
         }
+
+        
+        
+
+        // if player is in air (currently in a jump) and has more jumpForce, continue
+        // sending player upwards
+        else if (airGroundState == AirGroundState.AIR) {
+            if (jumpForce > 0) {
+                moveAmountY -= jumpForce;
+                jumpForce -= jumpDegrade;
+                if (jumpForce < 0) {
+                    jumpForce = 0;
+                }
+            }
+
+            if (Keyboard.isKeyDown(ATTACK_KEY)) {
+                playerState = PlayerState.ATTACKING;
+            }
+
+            // allows you to move left and right while in the air
+            if (Keyboard.isKeyDown(MOVE_LEFT_KEY)) {
+                moveAmountX -= walkSpeed;
+            } else if (Keyboard.isKeyDown(MOVE_RIGHT_KEY)) {
+                moveAmountX += walkSpeed;
+            }
+
+            // if player is falling, increases momentum as player falls so it falls faster
+            // over time
+            if (moveAmountY > 0) {
+                increaseMomentum();
+            }
+        }
+
+        // if player last frame was in air and this frame is now on ground, player
+        // enters STANDING state
+        else if (previousAirGroundState == AirGroundState.AIR && airGroundState == AirGroundState.GROUND) {
+            playerState = PlayerState.STANDING;
+        }
     }
 
     // player JUMPING state logic
@@ -283,6 +321,10 @@ public abstract class Player extends GameObject {
                 if (jumpForce < 0) {
                     jumpForce = 0;
                 }
+            }
+
+            if (Keyboard.isKeyDown(ATTACK_KEY)) {
+                playerState = PlayerState.ATTACKING;
             }
 
             // allows you to move left and right while in the air
@@ -384,11 +426,18 @@ public abstract class Player extends GameObject {
         } else if (playerState == PlayerState.JUMPING) {
             // if player is moving upwards, set player's animation to jump. if player moving
             // downwards, set player's animation to fall
+            if (playerState == PlayerState.ATTACKING) {
+                this.currentAnimationName = facingDirection == Direction.RIGHT ? "ATTACK_RIGHT" : "ATTACK_LEFT";
+            }
+
+
+
             if (lastAmountMovedY <= 0) {
                 this.currentAnimationName = facingDirection == Direction.RIGHT ? "JUMP_RIGHT" : "JUMP_LEFT";
             } else {
                 this.currentAnimationName = facingDirection == Direction.RIGHT ? "FALL_RIGHT" : "FALL_LEFT";
             }
+        
         } else if (playerState == PlayerState.ATTACKING) {
             this.currentAnimationName = facingDirection == Direction.RIGHT ? "ATTACK_RIGHT" : "ATTACK_LEFT";
         }
@@ -402,7 +451,7 @@ public abstract class Player extends GameObject {
     public void onEndCollisionCheckY(boolean hasCollided, Direction direction, MapEntity entityCollidedWith) {
         // if player collides with a map tile below it, it is now on the ground
         // if player does not collide with a map tile below, it is in air
-        if (direction == Direction.DOWN) {
+        if (direction == Direction.DOWN && playerState != PlayerState.ATTACKING) {
             if (hasCollided) {
                 momentumY = 0;
                 airGroundState = AirGroundState.GROUND;
