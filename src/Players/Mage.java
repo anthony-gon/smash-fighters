@@ -13,94 +13,171 @@ import Level.PlayerState;
 import Utils.Direction;
 import Utils.Point;
 
-import java.util.HashMap;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import java.io.File;
+import java.net.URL;
 import java.awt.Color;
+import java.util.HashMap;
 
 public class Mage extends Player {
-        private Rectangle hitbox;
-        private Rectangle attackHitbox;
-        protected float attackboxTimer = System.currentTimeMillis();
-        protected int shootTimer;
+    private Rectangle hitbox;
+    private Rectangle attackHitbox;
+    protected float attackboxTimer = System.currentTimeMillis();
+    protected int shootTimer;
 
-        public Mage(float x, float y) {
-                super(new SpriteSheet(ImageLoader.load("Gunner.png"), 23, 23), x, y, "STAND_RIGHT");
-                gravity = .5f;
-                terminalVelocityY = 6f;
-                jumpHeight = 14.5f;
-                jumpDegrade = .5f;
-                walkSpeed = 2.3f;
-                momentumYIncrease = .5f;
-                shootTimer = 0;
+    private Clip attackClip;
+    private Clip deathClip;
 
-                this.hitbox = new Rectangle(x, y, 33, 39);
-                hitbox.setColor(Color.RED);
+    private boolean isAttacking = false;
+    private boolean isAlive = true;
+    private boolean deathSoundPlayed = false;
 
-                this.attackHitbox = new Rectangle(x, y, 15, 30);
-                attackHitbox.setColor(Color.BLUE);
+    public Mage(float x, float y) {
+        super(new SpriteSheet(ImageLoader.load("GunnerBlue.png"), 23, 23), x, y, "STAND_RIGHT");
+        gravity = .5f;
+        terminalVelocityY = 6f;
+        jumpHeight = 14.5f;
+        jumpDegrade = .5f;
+        walkSpeed = 2.3f;
+        momentumYIncrease = .5f;
+        shootTimer = 0;
+
+        this.hitbox = new Rectangle(x, y, 33, 39);
+        hitbox.setColor(Color.RED);
+
+        this.attackHitbox = new Rectangle(x, y, 15, 30);
+        attackHitbox.setColor(Color.BLUE);
+
+        // Load sounds for attack and death
+        loadSound("Resources/Pew.wav", "attack"); // Replace with the actual path
+        loadSound("Resources/Death.wav", "death");   // Replace with the actual path
+    }
+
+    // Method to load sound based on the type
+    private void loadSound(String path, String type) {
+        try {
+            URL soundURL = getClass().getClassLoader().getResource(path);
+            Clip clip = null;
+            if (soundURL != null) {
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundURL);
+                clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                volumeControl.setValue(volumeControl.getMaximum());
+            } else {
+                File soundFile = new File(path);
+                if (soundFile.exists()) {
+                    AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+                    clip = AudioSystem.getClip();
+                    clip.open(audioInputStream);
+                    FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                    volumeControl.setValue(volumeControl.getMaximum());
+                }
+            }
+
+            if (type.equals("attack")) attackClip = clip;
+            if (type.equals("death")) deathClip = clip;
+        } catch (Exception e) {
+            System.err.println("Error loading " + type + " sound: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void playSound(Clip clip) {
+        if (clip != null) {
+            new Thread(() -> {
+                synchronized (clip) {
+                    if (clip.isRunning()) {
+                        clip.stop();
+                    }
+                    clip.setFramePosition(0);
+                    clip.start();
+                }
+            }).start();
+        }
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        // Check if the player is in the death animation and play death sound once
+        if ((getCurrentAnimationName().equals("DEATH_LEFT") || getCurrentAnimationName().equals("DEATH_RIGHT")) && isAlive && !deathSoundPlayed) {
+            playSound(deathClip); // Play death sound
+            deathSoundPlayed = true; // Prevent replaying the death sound during the same death animation
+            isAlive = false; // Character is now considered "dead"
         }
 
-        public void update() {
-                super.update();
-
-                int xOffset = 5;
-                int yOffset = 15;
-
-                hitbox.setLocation(getX() + xOffset, getY() + yOffset);
-
-                if (getFacingDirection() == Direction.LEFT) {
-                        hitbox.setLocation(getX() + 22 + xOffset, getY() + yOffset); // Offset left
-                } else {
-                        hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
-                }
-                if (System.currentTimeMillis() - attackboxTimer > 300) {
-                        attackHitbox.setLocation(1000, 1000);
-                }
-                if (getPlayerState() == PlayerState.ATTACKING && shootTimer == 0) {
-                        int fireballX;
-                        float movementSpeed;
-                        if (facingDirection == Direction.RIGHT) {
-                                fireballX = Math.round(getX()) + getWidth();
-                                fireballX = fireballX - 20;
-                                movementSpeed = 1.5f;
-                        } else {
-                                fireballX = Math.round(getX() - 21);
-                                fireballX = fireballX + 20;
-                                movementSpeed = -1.5f;
-                        }
-
-                        // define where fireball will spawn on the map (y location) relative to dinosaur
-                        // enemy's location
-                        int fireballY = Math.round(getY()) + 4;
-
-                        // create Fireball enemy
-                        Fireball fireball = new Fireball(new Point(fireballX, fireballY+15), movementSpeed, 70);
-
-                        // add fireball enemy to the map for it to spawn in the level
-                        map.addEnemy(fireball);
-                        shootTimer = 50;
-                }
-                if(shootTimer > 0) {
-                     shootTimer--;   
-                }
+        // Reset the death sound flag when the character is respawned or reinitialized
+        if (!getCurrentAnimationName().equals("DEATH_LEFT") && !getCurrentAnimationName().equals("DEATH_RIGHT")) {
+            deathSoundPlayed = false; // Allow death sound to play again on the next death
+            isAlive = true; // Character is "alive" again
         }
 
-        public void draw(GraphicsHandler graphicsHandler) {
-                super.draw(graphicsHandler);
-                // hitbox.draw(graphicsHandler);
-                if (getPlayerState() == PlayerState.ATTACKING) {
-                        // attackHitbox.draw(graphicsHandler);
-                }
-                // drawBounds(graphicsHandler, new Color(255, 0, 0, 170));
-                // drawBounds(graphicsHandler, new Color(255, 0, 0, 170));
+        // Logic for playing attack sound
+        if (getPlayerState() == PlayerState.ATTACKING && !isAttacking) {
+            playSound(attackClip);
+            isAttacking = true;
+        }
+        if (getPlayerState() != PlayerState.ATTACKING) {
+            isAttacking = false;
         }
 
-        public Rectangle getHitbox() {
-                return this.hitbox; // Getter for hitbox
+        int xOffset = 5;
+        int yOffset = 15;
+
+        hitbox.setLocation(getX() + xOffset, getY() + yOffset);
+
+        if (getFacingDirection() == Direction.LEFT) {
+            hitbox.setLocation(getX() + 22 + xOffset, getY() + yOffset); // Offset left
+        } else {
+            hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
         }
 
-        public Rectangle getAttackHitbox() {
-                return this.attackHitbox; // Getter for hitbox
+        if (System.currentTimeMillis() - attackboxTimer > 300) {
+            attackHitbox.setLocation(1000, 1000);
         }
+
+        if (getPlayerState() == PlayerState.ATTACKING && shootTimer == 0) {
+            int fireballX;
+            float movementSpeed;
+            if (facingDirection == Direction.RIGHT) {
+                fireballX = Math.round(getX()) + getWidth();
+                fireballX = fireballX - 20;
+                movementSpeed = 1.5f;
+            } else {
+                fireballX = Math.round(getX() - 21);
+                fireballX = fireballX + 20;
+                movementSpeed = -1.5f;
+            }
+
+            int fireballY = Math.round(getY()) + 4;
+            Fireball fireball = new Fireball(new Point(fireballX, fireballY + 15), movementSpeed, 70);
+            map.addEnemy(fireball);
+            shootTimer = 50;
+        }
+
+        if (shootTimer > 0) {
+            shootTimer--;
+        }
+    }
+
+    @Override
+    public void draw(GraphicsHandler graphicsHandler) {
+        super.draw(graphicsHandler);
+    }
+
+    public Rectangle getHitbox() {
+        return this.hitbox;
+    }
+
+    public Rectangle getAttackHitbox() {
+        return this.attackHitbox;
+    }
+
 
         @Override
         public HashMap<String, Frame[]> loadAnimations(SpriteSheet spriteSheet) {

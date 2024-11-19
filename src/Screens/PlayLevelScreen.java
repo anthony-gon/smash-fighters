@@ -9,6 +9,7 @@ import Game.GameState;
 import Game.ScreenCoordinator;
 import GameObject.Rectangle;
 import Level.HealthBar;
+import Level.LivesDisplay;
 import Level.Map;
 import Level.Player;
 import Level.PlayerListener;
@@ -36,9 +37,11 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 
 
+
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
+    
 
     protected Player player; // Player 1
     protected Player player2; // Player 2
@@ -47,6 +50,9 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
     protected HealthBar playerOneHB;
     protected HealthBar playerTwoHB;
+
+    protected LivesDisplay playerOneL;
+    protected LivesDisplay playerTwoL;
 
     protected String[] characters = { "Brawler", "Knight", "Gunner" };
     protected String playerOneChar; // Stores what type of player player one is for hitbox purposes
@@ -122,10 +128,15 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         playerOneHB.loadHealthBars();
         playerTwoHB.loadHealthBars();
 
+        this.playerOneL = new LivesDisplay(0, 3, 3);
+        this.playerTwoL = new LivesDisplay(1, 3, 3);
+        playerOneL.loadLives();
+        playerTwoL.loadLives();
+
         // Initialize map based on selected map name
         if (selectedMapName.equals("Inferno")) {
             this.map = new ToadsMap();
-        } else if (selectedMapName.equals("Ice Kingdom")) {
+        } else if (selectedMapName.equals("Tundra")) {
             this.map = new Map2();
         }
 
@@ -178,7 +189,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         playBackgroundMusic();
 
         // Initialize countdown
-        countdownTimer = 180; // 180 frames for 3 seconds countdown
+        countdownTimer = 45; // 180 frames for 3 seconds countdown
         countdownValue = 3;
         countdownComplete = false;
     }
@@ -360,11 +371,45 @@ public void update()
             }
             
             private void updatePauseMenu() {
-                    // TODO Auto-generated method stub
-                    throw new UnsupportedOperationException("Unimplemented method 'updatePauseMenu'");
+                if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
+                    currentPauseMenuItemHovered++;
+                    if (currentPauseMenuItemHovered >= pauseMenuItems.size()) {
+                        currentPauseMenuItemHovered = 0;
+                    }
+                    keyLocker.lockKey(Key.DOWN);
+                } else if (Keyboard.isKeyDown(Key.UP) && !keyLocker.isKeyLocked(Key.UP)) {
+                    currentPauseMenuItemHovered--;
+                    if (currentPauseMenuItemHovered < 0) {
+                        currentPauseMenuItemHovered = pauseMenuItems.size() - 1;
+                    }
+                    keyLocker.lockKey(Key.UP);
                 }
-            
-            
+        
+                if (Keyboard.isKeyUp(Key.UP)) {
+                    keyLocker.unlockKey(Key.UP);
+                }
+                if (Keyboard.isKeyUp(Key.DOWN)) {
+                    keyLocker.unlockKey(Key.DOWN);
+                }
+        
+                if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
+                    if (currentPauseMenuItemHovered == 0) {
+                        playLevelScreenState = PlayLevelScreenState.RUNNING;
+                        playBackgroundMusic(); // Resume music when unpaused
+                    } else if (currentPauseMenuItemHovered == 1) {
+                        goBackToMenu();
+                    }
+                    keyLocker.lockKey(Key.SPACE);
+                }
+        
+                if (Keyboard.isKeyUp(Key.SPACE)) {
+                    keyLocker.unlockKey(Key.SPACE);
+                }
+        
+                pausePointerLocationX = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getX() - pausePointerOffsetX;
+                pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
+            }
+        
             
             private void handleCountdown() {
     // Decrease the countdown timer
@@ -380,6 +425,7 @@ public void update()
             countdownComplete = true;
         }
     }
+
 }
 
 @Override
@@ -423,8 +469,11 @@ public void draw(GraphicsHandler graphicsHandler) {
                 }
             }
 
-            playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
-            playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
+                playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
+                playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
+
+                playerOneL.draw(graphicsHandler, player.getPlayerLives());
+                playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
             // Draw countdown if it's not complete
             if (!countdownComplete) {
@@ -456,11 +505,22 @@ public void draw(GraphicsHandler graphicsHandler) {
             }
             
             private void drawPauseMenu(GraphicsHandler graphicsHandler) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'drawPauseMenu'");
+                graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
+        
+                for (SpriteFont menuItem : pauseMenuItems) {
+                    menuItem.draw(graphicsHandler);
+                }
+        
+                // Draw pointer
+                graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
+                        new Color(49, 207, 240), Color.black, 2);
+            }
+        
+            public PlayLevelScreenState getPlayLevelScreenState() {
+                return playLevelScreenState;
             }
             
-            
+          
             
             private void drawCountdown(GraphicsHandler graphicsHandler) {
     // Determine the text to display
@@ -492,9 +552,10 @@ public void draw(GraphicsHandler graphicsHandler) {
     public void onDeath() {
         if (playLevelScreenState != PlayLevelScreenState.LEVEL_LOSE) {
             playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-            stopBackgroundMusic(); // Stop music when the player dies
+            stopBackgroundMusic(); // Stop the music
         }
     }
+    
 
     public void resetLevel() {
         initialize();

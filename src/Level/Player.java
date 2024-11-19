@@ -431,7 +431,7 @@ public abstract class Player extends GameObject {
                     this.x -= 0;
                     this.y -= 0;
                     lastDamage = System.currentTimeMillis();
-                    if (getPlayerHealth() <= 10) {
+                    if (getPlayerHealth() <= 0 && getPlayerLives() <= 0) {
                         System.out.println("Player Dead");
                         levelState = LevelState.PLAYER_DEAD;
                         this.playerHealth = 100;

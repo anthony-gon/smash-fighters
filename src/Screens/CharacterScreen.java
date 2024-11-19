@@ -66,9 +66,6 @@ public class CharacterScreen extends Screen {
         currentPlayerText.setOutlineColor(Color.black);
         currentPlayerText.setOutlineThickness(3);
 
-        //More Text
-
-
         keyPressTimer = 0;
         keyLocker.lockKey(Key.SPACE); // Lock both keys initially
         keyLocker.lockKey(Key.ENTER);
@@ -209,9 +206,10 @@ public class CharacterScreen extends Screen {
         for (SpriteFont characterItem : characterItems) {
             characterItem.draw(graphicsHandler);
         }
-        
+
         // Draw the pointer next to the selected character
-        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+        Color pointerColor = (currentPlayer == 1) ? new Color(49, 207, 240) : new Color(255, 0, 0); // Blue for P1, Red for P2
+        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor, Color.black, 2);
     }
 
     // Methods to return selected characters for Player 1 and Player 2
