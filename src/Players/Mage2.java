@@ -28,22 +28,23 @@ public class Mage2 extends Player {
     protected float attackboxTimer = System.currentTimeMillis();
     protected int shootTimer;
 
-    private Clip attackClip;
-    private Clip deathClip;
-
     private boolean isAttacking = false;
     private boolean isAlive = true;
     private boolean deathSoundPlayed = false;
+    private Clip attackClip;
+    private Clip deathClip;
+        public Mage2(float x, float y) {
+                super(new SpriteSheet(ImageLoader.load("Gunner.png"), 23, 23), x, y, "STAND_RIGHT");
+                gravity = .5f;
+                terminalVelocityY = 6f;
+                jumpHeight = 14.5f;
+                jumpDegrade = .5f;
+                walkSpeed = 2.3f;
+                momentumYIncrease = .5f;
 
-    public Mage2(float x, float y) {
-        super(new SpriteSheet(ImageLoader.load("Gunner.png"), 23, 23), x, y, "STAND_RIGHT");
-        gravity = .5f;
-        terminalVelocityY = 6f;
-        jumpHeight = 14.5f;
-        jumpDegrade = .5f;
-        walkSpeed = 2.3f;
-        momentumYIncrease = .5f;
-        shootTimer = 0;
+    
+
+
 
         this.hitbox = new Rectangle(x, y, 33, 39);
         hitbox.setColor(Color.RED);
@@ -52,7 +53,7 @@ public class Mage2 extends Player {
         attackHitbox.setColor(Color.BLUE);
 
         // Load sounds for attack and death
-        loadSound("Resources/.wav", "attack"); // Replace with the actual path
+        loadSound("Resources/Pew.wav", "attack"); // Replace with the actual path
         loadSound("Resources/Death.wav", "death");   // Replace with the actual path
     }
 

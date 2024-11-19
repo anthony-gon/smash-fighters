@@ -28,22 +28,24 @@ public class Mage extends Player {
     protected float attackboxTimer = System.currentTimeMillis();
     protected int shootTimer;
 
-    private Clip attackClip;
-    private Clip deathClip;
 
     private boolean isAttacking = false;
     private boolean isAlive = true;
     private boolean deathSoundPlayed = false;
+    private Clip attackClip;
+    private Clip deathClip;
+        public Mage(float x, float y) {
+                super(new SpriteSheet(ImageLoader.load("GunnerBlue.png"), 23, 23), x, y, "STAND_RIGHT");
+                gravity = .5f;
+                terminalVelocityY = 6f;
+                jumpHeight = 14.5f;
+                jumpDegrade = .5f;
+                walkSpeed = 2.3f;
+                momentumYIncrease = .5f;
+                shootTimer = 0;
 
-    public Mage(float x, float y) {
-        super(new SpriteSheet(ImageLoader.load("GunnerBlue.png"), 23, 23), x, y, "STAND_RIGHT");
-        gravity = .5f;
-        terminalVelocityY = 6f;
-        jumpHeight = 14.5f;
-        jumpDegrade = .5f;
-        walkSpeed = 2.3f;
-        momentumYIncrease = .5f;
-        shootTimer = 0;
+
+    
 
         this.hitbox = new Rectangle(x, y, 33, 39);
         hitbox.setColor(Color.RED);

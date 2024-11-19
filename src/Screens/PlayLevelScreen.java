@@ -166,6 +166,8 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             playerTwoChar = characters[2];
         }
 
+        this.player2.setFacingDirection(Direction.LEFT);
+
         // Assign movement keys for Player 2 (JIKL)
         player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
 
@@ -471,6 +473,9 @@ public void draw(GraphicsHandler graphicsHandler) {
 
                 playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
                 playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
+
+                playerOneL.draw(graphicsHandler, player.getPlayerLives());
+                playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
                 playerOneL.draw(graphicsHandler, player.getPlayerLives());
                 playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
