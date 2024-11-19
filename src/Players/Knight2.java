@@ -35,7 +35,7 @@ public class Knight2 extends Player {
     private boolean hasSpawned = false;
 
     public Knight2(float x, float y) {
-        super(new SpriteSheet(ImageLoader.load("Knight.png"), 22, 24), x, y, "STAND_RIGHT");
+        super(new SpriteSheet(ImageLoader.load("Knight.png"), 24, 24), x, y, "STAND_RIGHT");
         gravity = .5f;
         terminalVelocityY = 6f;
         jumpHeight = 14.5f;
