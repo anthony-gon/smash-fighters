@@ -36,12 +36,9 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.FontMetrics;
 
-
-
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
-    
 
     protected Player player; // Player 1
     protected Player player2; // Player 2
@@ -111,8 +108,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         this.screenCoordinator = screenCoordinator;
     }
 
-    
-
     @Override
     public void initialize() {
         // Get the selected map name from the ScreenCoordinator
@@ -158,11 +153,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     map.getPlayerStartPosition().y); // Player 2
             playerTwoChar = characters[0];
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.SWORDSMAN) {
-            this.player2 = new Knight2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player 2
+            this.player2 = new Knight2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
+                                                                                                                         // 2
             playerTwoChar = characters[1];
 
         } else if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.GUNNER) {
-            this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player 2
+            this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
+                                                                                                                       // 2
             playerTwoChar = characters[2];
         }
 
@@ -202,7 +199,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         if (playerOneChar == characters[0]) {
             return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
         } else if (playerOneChar == characters[1]) {
-            return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
+            return new Rectangle((int) player.getX() + 18, (int) player.getY() + 10, 38, 46);
         }
         return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
     }
@@ -211,7 +208,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         if (playerTwoChar == characters[0]) {
             return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
         } else if (playerTwoChar == characters[1]) {
-            return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
+            return new Rectangle((int) player2.getX() + 18, (int) player2.getY() + 10, 38, 46);
         }
         return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
     }
@@ -227,6 +224,16 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     return new Rectangle((int) player.getX() + 60, (int) player.getY() + 25, 15, 15);
                 }
             }
+        } else if ((playerOneChar == characters[1])) {
+            if (player.getFacingDirection() == Direction.LEFT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() - 10, (int) player.getY() + 25, 25, 12);
+                }
+            } else if (player.getFacingDirection() == Direction.RIGHT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() + 60, (int) player.getY() + 25, 25, 12);
+                }
+            }
         }
         return new Rectangle();
     }
@@ -240,6 +247,16 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             } else if (player2.getFacingDirection() == Direction.RIGHT) {
                 if (player2.getPlayerState() == PlayerState.ATTACKING) {
                     return new Rectangle((int) player2.getX() + 60, (int) player2.getY() + 25, 15, 15);
+                }
+            }
+        } else if ((playerTwoChar == characters[1])) {
+            if (player2.getFacingDirection() == Direction.LEFT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() - 10, (int) player2.getY() + 25, 25, 12);
+                }
+            } else if (player2.getFacingDirection() == Direction.RIGHT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() + 60, (int) player2.getY() + 25, 25, 12);
                 }
             }
         }
@@ -278,198 +295,196 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     }
 
     @Override
-public void update() 
-{
-    // Handle pause input with the ESCAPE key
-    if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
-        if (playLevelScreenState == PlayLevelScreenState.RUNNING) {
-            playLevelScreenState = PlayLevelScreenState.PAUSED;
-            stopBackgroundMusic(); // Stop music when the game is paused
-        } else if (playLevelScreenState == PlayLevelScreenState.PAUSED) {
-            playLevelScreenState = PlayLevelScreenState.RUNNING;
-            playBackgroundMusic(); // Resume music when unpaused
+    public void update() {
+        // Handle pause input with the ESCAPE key
+        if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
+            if (playLevelScreenState == PlayLevelScreenState.RUNNING) {
+                playLevelScreenState = PlayLevelScreenState.PAUSED;
+                stopBackgroundMusic(); // Stop music when the game is paused
+            } else if (playLevelScreenState == PlayLevelScreenState.PAUSED) {
+                playLevelScreenState = PlayLevelScreenState.RUNNING;
+                playBackgroundMusic(); // Resume music when unpaused
+            }
+            keyLocker.lockKey(Key.ESC);
         }
-        keyLocker.lockKey(Key.ESC);
-    }
 
-    if (Keyboard.isKeyUp(Key.ESC)) {
-        keyLocker.unlockKey(Key.ESC);
-    }
+        if (Keyboard.isKeyUp(Key.ESC)) {
+            keyLocker.unlockKey(Key.ESC);
+        }
 
-    // Handle countdown state
-    if (!countdownComplete) {
-        handleCountdown(); // Only handle countdown if it's not complete
-        return; // Skip the rest of the update method until countdown is complete
-    }
+        // Handle countdown state
+        if (!countdownComplete) {
+            handleCountdown(); // Only handle countdown if it's not complete
+            return; // Skip the rest of the update method until countdown is complete
+        }
 
-    switch (playLevelScreenState) {
-        case RUNNING:
-            try {
-                player.update(); // Player 1
-                player2.update(); // Player 2
+        switch (playLevelScreenState) {
+            case RUNNING:
+                try {
+                    player.update(); // Player 1
+                    player2.update(); // Player 2
 
-                // Check each player combination for attack collisions
+                    // Check each player combination for attack collisions
 
-                // Determine if any player has lost all health and set the winner
-                if (player2.getPlayerHealth() <= 0) {
-                    kbPlayerTwoLeft = false;
-                    kbPlayerTwoRight = false;
-                    player2.removeLives(1);
-                    player2.setLocation(map.getPlayerStartPosition().x + 410, map.getPlayerStartPosition().y);
+                    // Determine if any player has lost all health and set the winner
+                    if (player2.getPlayerHealth() <= 0) {
+                        kbPlayerTwoLeft = false;
+                        kbPlayerTwoRight = false;
+                        player2.removeLives(1);
+                        player2.setLocation(map.getPlayerStartPosition().x + 410, map.getPlayerStartPosition().y);
 
-                    if (player2.getPlayerLives() > 0) {
-                        player2.resetHealth(100);
-                    } else {
-                        isPlayer1Winner = true;
-                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
-                        stopBackgroundMusic();
+                        if (player2.getPlayerLives() > 0) {
+                            player2.resetHealth(100);
+                        } else {
+                            isPlayer1Winner = true;
+                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                            stopBackgroundMusic();
+                        }
+                    } else if (player.getPlayerHealth() <= 0) {
+                        kbPlayerOneLeft = false;
+                        kbPlayerOneRight = false;
+                        player.removeLives(1);
+                        player.setLocation(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+
+                        if (player.getPlayerLives() > 0) {
+                            player.resetHealth(100);
+                        } else {
+                            isPlayer1Winner = false;
+                            playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
+                            levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
+                            stopBackgroundMusic();
+                        }
                     }
-                } else if (player.getPlayerHealth() <= 0) {
-                    kbPlayerOneLeft = false;
-                    kbPlayerOneRight = false;
-                    player.removeLives(1);
-                    player.setLocation(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
 
-                    if (player.getPlayerLives() > 0) {
-                        player.resetHealth(100);
-                    } else {
-                        isPlayer1Winner = false;
-                        playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-                        levelLoseScreen = new LevelLoseScreen(this, isPlayer1Winner);
-                        stopBackgroundMusic();
-                    }
+                    map.update(player);
+                    map.update(player2);
+                } catch (NullPointerException e) {
+                    System.err.println("Error updating player: " + e.getMessage());
                 }
+                break;
 
-                map.update(player);
-                map.update(player2);
-            } catch (NullPointerException e) {
-                System.err.println("Error updating player: " + e.getMessage());
-            }
-            break;
-
-        case LEVEL_COMPLETED:
-            if (levelCompletedStateChangeStart) {
-                screenTimer = 130;
-                levelCompletedStateChangeStart = false;
-            } else {
-                levelClearedScreen.update();
-                screenTimer--;
-                if (screenTimer == 0) {
-                    goBackToMenu();
-                }
-            }
-            break;
-
-        case LEVEL_LOSE:
-            stopBackgroundMusic(); // Stop music when the player dies
-            levelLoseScreen.update();
-            break;
-
-        case PAUSED:
-            updatePauseMenu();
-                        break;
-                }
-            }
-            
-            private void updatePauseMenu() {
-                if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
-                    currentPauseMenuItemHovered++;
-                    if (currentPauseMenuItemHovered >= pauseMenuItems.size()) {
-                        currentPauseMenuItemHovered = 0;
-                    }
-                    keyLocker.lockKey(Key.DOWN);
-                } else if (Keyboard.isKeyDown(Key.UP) && !keyLocker.isKeyLocked(Key.UP)) {
-                    currentPauseMenuItemHovered--;
-                    if (currentPauseMenuItemHovered < 0) {
-                        currentPauseMenuItemHovered = pauseMenuItems.size() - 1;
-                    }
-                    keyLocker.lockKey(Key.UP);
-                }
-        
-                if (Keyboard.isKeyUp(Key.UP)) {
-                    keyLocker.unlockKey(Key.UP);
-                }
-                if (Keyboard.isKeyUp(Key.DOWN)) {
-                    keyLocker.unlockKey(Key.DOWN);
-                }
-        
-                if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
-                    if (currentPauseMenuItemHovered == 0) {
-                        playLevelScreenState = PlayLevelScreenState.RUNNING;
-                        playBackgroundMusic(); // Resume music when unpaused
-                    } else if (currentPauseMenuItemHovered == 1) {
+            case LEVEL_COMPLETED:
+                if (levelCompletedStateChangeStart) {
+                    screenTimer = 130;
+                    levelCompletedStateChangeStart = false;
+                } else {
+                    levelClearedScreen.update();
+                    screenTimer--;
+                    if (screenTimer == 0) {
                         goBackToMenu();
                     }
-                    keyLocker.lockKey(Key.SPACE);
                 }
-        
-                if (Keyboard.isKeyUp(Key.SPACE)) {
-                    keyLocker.unlockKey(Key.SPACE);
-                }
-        
-                pausePointerLocationX = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getX() - pausePointerOffsetX;
-                pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
-            }
-        
-            
-            private void handleCountdown() {
-    // Decrease the countdown timer
-    countdownTimer--;
+                break;
 
-    // When countdownTimer reaches zero, decrease countdownValue
-    if (countdownTimer <= 0) {
-        countdownValue--; // Move to the next number or "FIGHT!"
-        countdownTimer = 60; // Reset timer for the next countdown step
+            case LEVEL_LOSE:
+                stopBackgroundMusic(); // Stop music when the player dies
+                levelLoseScreen.update();
+                break;
 
-        // Check if countdown has reached zero, then mark countdown as complete
-        if (countdownValue < 0) {
-            countdownComplete = true;
+            case PAUSED:
+                updatePauseMenu();
+                break;
         }
     }
 
-}
-
-@Override
-public void draw(GraphicsHandler graphicsHandler) {
-    switch (playLevelScreenState) {
-        case RUNNING:
-            map.draw(graphicsHandler);
-
-            player.draw(graphicsHandler); // Draw Player 1
-            player2.draw(graphicsHandler); // Draw Player 2
-
-            playerOneHitboxPos();
-            playerTwoHitboxPos();
-
-            playerOneHurtBox();
-            playerTwoHurtBox();
-
-            playerOneHitDetection();
-            playerTwoHitDetection();
-
-            if (kbPlayerTwoLeft) {
-                System.out.println("should kb");
-                if (!player2.applyKnockbackLeft()) {
-                    kbPlayerTwoLeft = false;
-                }
-            } else if (kbPlayerTwoRight) {
-                System.out.println("should kb");
-                if (!player2.applyKnockbackRight()) {
-                    kbPlayerTwoRight = false;
-                }
+    private void updatePauseMenu() {
+        if (Keyboard.isKeyDown(Key.DOWN) && !keyLocker.isKeyLocked(Key.DOWN)) {
+            currentPauseMenuItemHovered++;
+            if (currentPauseMenuItemHovered >= pauseMenuItems.size()) {
+                currentPauseMenuItemHovered = 0;
             }
-            if (kbPlayerOneLeft) {
-                System.out.println("should kb");
-                if (!player.applyKnockbackLeft()) {
-                    kbPlayerOneLeft = false;
-                }
-            } else if (kbPlayerOneRight) {
-                System.out.println("should kb");
-                if (!player.applyKnockbackRight()) {
-                    kbPlayerOneRight = false;
-                }
+            keyLocker.lockKey(Key.DOWN);
+        } else if (Keyboard.isKeyDown(Key.UP) && !keyLocker.isKeyLocked(Key.UP)) {
+            currentPauseMenuItemHovered--;
+            if (currentPauseMenuItemHovered < 0) {
+                currentPauseMenuItemHovered = pauseMenuItems.size() - 1;
             }
+            keyLocker.lockKey(Key.UP);
+        }
+
+        if (Keyboard.isKeyUp(Key.UP)) {
+            keyLocker.unlockKey(Key.UP);
+        }
+        if (Keyboard.isKeyUp(Key.DOWN)) {
+            keyLocker.unlockKey(Key.DOWN);
+        }
+
+        if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
+            if (currentPauseMenuItemHovered == 0) {
+                playLevelScreenState = PlayLevelScreenState.RUNNING;
+                playBackgroundMusic(); // Resume music when unpaused
+            } else if (currentPauseMenuItemHovered == 1) {
+                goBackToMenu();
+            }
+            keyLocker.lockKey(Key.SPACE);
+        }
+
+        if (Keyboard.isKeyUp(Key.SPACE)) {
+            keyLocker.unlockKey(Key.SPACE);
+        }
+
+        pausePointerLocationX = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getX() - pausePointerOffsetX;
+        pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
+    }
+
+    private void handleCountdown() {
+        // Decrease the countdown timer
+        countdownTimer--;
+
+        // When countdownTimer reaches zero, decrease countdownValue
+        if (countdownTimer <= 0) {
+            countdownValue--; // Move to the next number or "FIGHT!"
+            countdownTimer = 60; // Reset timer for the next countdown step
+
+            // Check if countdown has reached zero, then mark countdown as complete
+            if (countdownValue < 0) {
+                countdownComplete = true;
+            }
+        }
+
+    }
+
+    @Override
+    public void draw(GraphicsHandler graphicsHandler) {
+        switch (playLevelScreenState) {
+            case RUNNING:
+                map.draw(graphicsHandler);
+
+                player.draw(graphicsHandler); // Draw Player 1
+                player2.draw(graphicsHandler); // Draw Player 2
+
+                playerOneHitboxPos();
+                playerTwoHitboxPos();
+
+                playerOneHurtBox();
+                playerTwoHurtBox();
+
+                playerOneHitDetection();
+                playerTwoHitDetection();
+
+                if (kbPlayerTwoLeft) {
+                    System.out.println("should kb");
+                    if (!player2.applyKnockbackLeft()) {
+                        kbPlayerTwoLeft = false;
+                    }
+                } else if (kbPlayerTwoRight) {
+                    System.out.println("should kb");
+                    if (!player2.applyKnockbackRight()) {
+                        kbPlayerTwoRight = false;
+                    }
+                }
+                if (kbPlayerOneLeft) {
+                    System.out.println("should kb");
+                    if (!player.applyKnockbackLeft()) {
+                        kbPlayerOneLeft = false;
+                    }
+                } else if (kbPlayerOneRight) {
+                    System.out.println("should kb");
+                    if (!player.applyKnockbackRight()) {
+                        kbPlayerOneRight = false;
+                    }
+                }
 
                 playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
                 playerTwoHB.draw(graphicsHandler, player2.getPlayerHealth());
@@ -480,71 +495,68 @@ public void draw(GraphicsHandler graphicsHandler) {
                 playerOneL.draw(graphicsHandler, player.getPlayerLives());
                 playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
-            // Draw countdown if it's not complete
-            if (!countdownComplete) {
-                drawCountdown(graphicsHandler);
-            }
-
-            // Only log health when it changes
-            if (player.getPlayerHealth() != previousHealth) {
-                System.out.println("Player health: " + player.getPlayerHealth());
-                previousHealth = player.getPlayerHealth();
-            }
-
-            break;
-
-        case LEVEL_COMPLETED:
-            levelClearedScreen.draw(graphicsHandler);
-            break;
-
-        case LEVEL_LOSE:
-            levelLoseScreen.draw(graphicsHandler);
-            break;
-
-        case PAUSED:
-            map.draw(graphicsHandler);
-            player.draw(graphicsHandler);
-            drawPauseMenu(graphicsHandler);
-                        break;
+                // Draw countdown if it's not complete
+                if (!countdownComplete) {
+                    drawCountdown(graphicsHandler);
                 }
-            }
-            
-            private void drawPauseMenu(GraphicsHandler graphicsHandler) {
-                graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
-        
-                for (SpriteFont menuItem : pauseMenuItems) {
-                    menuItem.draw(graphicsHandler);
+
+                // Only log health when it changes
+                if (player.getPlayerHealth() != previousHealth) {
+                    System.out.println("Player health: " + player.getPlayerHealth());
+                    previousHealth = player.getPlayerHealth();
                 }
-        
-                // Draw pointer
-                graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
-                        new Color(49, 207, 240), Color.black, 2);
-            }
-        
-            public PlayLevelScreenState getPlayLevelScreenState() {
-                return playLevelScreenState;
-            }
-            
-          
-            
-            private void drawCountdown(GraphicsHandler graphicsHandler) {
-    // Determine the text to display
-    String countdownText = (countdownValue > 0) ? String.valueOf(countdownValue) : "FIGHT!";
 
-    // Define font and color
-    Font font = new Font("fibberish", Font.BOLD, 72);
-    Color color = Color.RED;
+                break;
 
-    // Calculate the position to center the text
-    FontMetrics metrics = graphicsHandler.getGraphics().getFontMetrics(font);
-    int textX = 350 - metrics.stringWidth(countdownText) / 2;
-    int textY = 200 - metrics.getHeight() / 2 + metrics.getAscent();
+            case LEVEL_COMPLETED:
+                levelClearedScreen.draw(graphicsHandler);
+                break;
 
-    // Draw the centered countdown text
-    graphicsHandler.drawString(countdownText, textX, textY, font, color);
-}
+            case LEVEL_LOSE:
+                levelLoseScreen.draw(graphicsHandler);
+                break;
 
-    
+            case PAUSED:
+                map.draw(graphicsHandler);
+                player.draw(graphicsHandler);
+                drawPauseMenu(graphicsHandler);
+                break;
+        }
+    }
+
+    private void drawPauseMenu(GraphicsHandler graphicsHandler) {
+        graphicsHandler.drawFilledRectangleWithBorder(250, 150, 300, 200, new Color(0, 0, 0, 150), Color.white, 3);
+
+        for (SpriteFont menuItem : pauseMenuItems) {
+            menuItem.draw(graphicsHandler);
+        }
+
+        // Draw pointer
+        graphicsHandler.drawFilledRectangleWithBorder(pausePointerLocationX, pausePointerLocationY, 20, 20,
+                new Color(49, 207, 240), Color.black, 2);
+    }
+
+    public PlayLevelScreenState getPlayLevelScreenState() {
+        return playLevelScreenState;
+    }
+
+    private void drawCountdown(GraphicsHandler graphicsHandler) {
+        // Determine the text to display
+        String countdownText = (countdownValue > 0) ? String.valueOf(countdownValue) : "FIGHT!";
+
+        // Define font and color
+        Font font = new Font("fibberish", Font.BOLD, 72);
+        Color color = Color.RED;
+
+        // Calculate the position to center the text
+        FontMetrics metrics = graphicsHandler.getGraphics().getFontMetrics(font);
+        int textX = 350 - metrics.stringWidth(countdownText) / 2;
+        int textY = 200 - metrics.getHeight() / 2 + metrics.getAscent();
+
+        // Draw the centered countdown text
+        graphicsHandler.drawString(countdownText, textX, textY, font, color);
+    }
+
     @Override
     public void onLevelCompleted() {
         if (playLevelScreenState != PlayLevelScreenState.LEVEL_COMPLETED) {
@@ -560,7 +572,6 @@ public void draw(GraphicsHandler graphicsHandler) {
             stopBackgroundMusic(); // Stop the music
         }
     }
-    
 
     public void resetLevel() {
         initialize();
