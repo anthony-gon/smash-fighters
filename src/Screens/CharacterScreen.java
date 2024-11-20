@@ -29,7 +29,7 @@ public class CharacterScreen extends Screen {
 
     // Enum to represent character selections
     public enum SelectedCharacter {
-        BRAWLER, SWORDSMAN, GUNNER
+        BRAWLER, SWORDSMAN, GUNNER, DIDDY
     }
 
     // Fields to store the selected character for Player 1 and Player 2
@@ -38,6 +38,7 @@ public class CharacterScreen extends Screen {
 
     // Tracks which player is currently selecting their character
     private int currentPlayer = 1;
+    private int funnyNames = 0;
 
     public CharacterScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -62,7 +63,8 @@ public class CharacterScreen extends Screen {
         characterItems = Arrays.asList(brawler, swordsman, gunner);
 
         // Initialize text that shows which player is selecting
-        currentPlayerText = new SpriteFont("PLAYER 1: SELECT YOUR CHARACTER ", 150, 120, "fibberish", 30, new Color(255, 255, 255));
+        currentPlayerText = new SpriteFont("PLAYER 1: SELECT YOUR CHARACTER ", 150, 120, "fibberish", 30,
+                new Color(255, 255, 255));
         currentPlayerText.setOutlineColor(Color.black);
         currentPlayerText.setOutlineThickness(3);
 
@@ -119,14 +121,32 @@ public class CharacterScreen extends Screen {
             keyLocker.unlockKey(Key.SPACE); // Unlock SPACE once it's released
         }
 
+        if (Keyboard.isKeyDown(Key.B) && keyPressTimer == 0) {
+            funnyNames += 1;
+            if (funnyNames % 2 != 0) {
+                brawler.setText("Baby Oil Man");
+                keyPressTimer = 14;
+            } else {
+                brawler.setText("Brawler");
+                keyPressTimer = 14;
+            }
+        }
+
         if (!keyLocker.isKeyLocked(Key.SPACE) && Keyboard.isKeyDown(Key.SPACE)) {
             // When a character is selected, assign it to Player 1
             switch (currentCharacterItemHovered) {
                 case 0:
-                    selectedCharacterP1 = SelectedCharacter.BRAWLER;
+                    if (brawler.getText() == "Brawler") {
+                        selectedCharacterP1 = SelectedCharacter.BRAWLER;
+                        brawler.setText("Brawler");
+                    } else {
+                        selectedCharacterP1 = SelectedCharacter.DIDDY;
+                        brawler.setText("Brawler");
+                    }
                     break;
                 case 1:
                     selectedCharacterP1 = SelectedCharacter.SWORDSMAN;
+                    brawler.setText("Brawler");
                     break;
                 case 2:
                     selectedCharacterP1 = SelectedCharacter.GUNNER;
@@ -208,8 +228,10 @@ public class CharacterScreen extends Screen {
         }
 
         // Draw the pointer next to the selected character
-        Color pointerColor = (currentPlayer == 1) ? new Color(49, 207, 240) : new Color(255, 0, 0); // Blue for P1, Red for P2
-        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor, Color.black, 2);
+        Color pointerColor = (currentPlayer == 1) ? new Color(49, 207, 240) : new Color(255, 0, 0); // Blue for P1, Red
+                                                                                                    // for P2
+        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor,
+                Color.black, 2);
     }
 
     // Methods to return selected characters for Player 1 and Player 2

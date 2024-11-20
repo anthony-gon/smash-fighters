@@ -18,6 +18,7 @@ import Maps.Map2;
 import Maps.ToadsMap;
 import Players.Brawler;
 import Players.Brawler2;
+import Players.Diddy;
 import Players.Knight;
 import Players.Knight2;
 import Players.Mage;
@@ -51,7 +52,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected LivesDisplay playerOneL;
     protected LivesDisplay playerTwoL;
 
-    protected String[] characters = { "Brawler", "Knight", "Gunner" };
+    protected String[] characters = { "Brawler", "Knight", "Gunner", "Diddy" };
     protected String playerOneChar; // Stores what type of player player one is for hitbox purposes
     protected String playerTwoChar; // Stores what type of player player two is for hitbox purposes
 
@@ -104,6 +105,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     // Music-related properties
     protected Clip musicClip;
 
+    // Iterator for Hurtbox Logic
+    int attackArrayIt = 0;
+
+    // Attack Array should be Pixels relative to players hitbox X, Length in frames,
+    // Next Hit Box Pixels
+    int[] brawlerAttackArray;
+
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -145,7 +153,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.GUNNER) {
             this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
             playerOneChar = characters[2];
+        } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.DIDDY) {
+            this.player = new Diddy(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            playerOneChar = characters[3];
         }
+
         int player2OffsetX = 430;
         // Setup player 2 based on the selected character
         if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
@@ -214,7 +226,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     }
 
     public Rectangle playerOneHurtBox() {
-        if (playerOneChar == characters[0]) {
+        if (playerOneChar == characters[0] || playerOneChar == characters[3]) {
             if (player.getFacingDirection() == Direction.LEFT) {
                 if (player.getPlayerState() == PlayerState.ATTACKING) {
                     return new Rectangle((int) player.getX() - 5, (int) player.getY() + 25, 15, 15);
@@ -262,6 +274,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         }
         return new Rectangle();
 
+    }
+
+    public Rectangle attackArrayLogic(int[] attackArray) {
+
+        return new Rectangle();
     }
 
     public void playerOneHitDetection() {
