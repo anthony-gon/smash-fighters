@@ -144,7 +144,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             this.map = new Map2();
         } else if (selectedMapName.equals("Toads")) {
             this.map = new Toad();
-        } 
+        }
 
         // Setup player 1 based on the selected character
         if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.BRAWLER) {
