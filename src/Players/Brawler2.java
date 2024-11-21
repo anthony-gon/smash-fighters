@@ -11,75 +11,158 @@ import Level.Player;
 import Level.PlayerState;
 import Utils.Direction;
 
-import java.util.HashMap;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import java.io.File;
+import java.net.URL;
 import java.awt.Color;
+import java.util.HashMap;
 
 public class Brawler2 extends Player {
-        private Rectangle hitbox;
-        private Rectangle attackHitbox;
-        protected long attackboxTimer = System.currentTimeMillis();
+    private Rectangle hitbox;
+    private Rectangle attackHitbox;
+    protected long attackboxTimer = System.currentTimeMillis();
 
-        public Brawler2(float x, float y) {
-                super(new SpriteSheet(ImageLoader.load("BrawlerBlue.png"), 24, 24), x, y, "STAND_RIGHT");
-                gravity = .5f;
-                terminalVelocityY = 6f;
-                jumpHeight = 14.5f;
-                jumpDegrade = .5f;
-                walkSpeed = 2.3f;
-                momentumYIncrease = .5f;
+    private Clip attackClip;
+    private Clip deathClip;
 
-                this.hitbox = new Rectangle(x, y, 33, 39);
-                hitbox.setColor(Color.RED);
+    private boolean isAttacking = false;
+    private boolean isAlive = true;
+    private boolean deathSoundPlayed = false;
 
-                this.attackHitbox = new Rectangle(x, y, 15, 30);
-                attackHitbox.setColor(Color.BLUE);
-        }
+    public Brawler2(float x, float y) {
+        super(new SpriteSheet(ImageLoader.load("Brawler.png"), 24, 24), x, y, "STAND_RIGHT");
+        gravity = .5f;
+        terminalVelocityY = 6f;
+        jumpHeight = 14.5f;
+        jumpDegrade = .5f;
+        walkSpeed = 2.3f;
+        momentumYIncrease = .5f;
 
-        public void update() {
-                super.update();
+        this.hitbox = new Rectangle(x, y, 33, 39);
+        hitbox.setColor(Color.RED);
 
-                int xOffset = 5;
-                int yOffset = 15;
+        this.attackHitbox = new Rectangle(x, y, 15, 30);
+        attackHitbox.setColor(Color.BLUE);
 
-                hitbox.setLocation(getX() + xOffset, getY() + yOffset);
+        // Load sounds for attack and death
+        loadSound("Resources/Batk2.wav", "attack");
+        loadSound("Resources/TestSound.wav", "death");
+    }
 
-                if (getFacingDirection() == Direction.LEFT) {
-                        hitbox.setLocation(getX() + 22 + xOffset, getY() + yOffset); // Offset left
-                } else {
-                        hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
+    // Method to load sound based on the type
+    private void loadSound(String path, String type) {
+        try {
+            URL soundURL = getClass().getClassLoader().getResource(path);
+            Clip clip = null;
+            if (soundURL != null) {
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundURL);
+                clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                volumeControl.setValue(volumeControl.getMaximum());
+            } else {
+                File soundFile = new File(path);
+                if (soundFile.exists()) {
+                    AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+                    clip = AudioSystem.getClip();
+                    clip.open(audioInputStream);
+                    FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                    volumeControl.setValue(volumeControl.getMaximum());
                 }
-                if (System.currentTimeMillis() - attackboxTimer > 300) {
-                        attackHitbox.setLocation(1000, 1000);
+            }
+
+            if (type.equals("attack")) attackClip = clip;
+            if (type.equals("death")) deathClip = clip;
+        } catch (Exception e) {
+            System.err.println("Error loading " + type + " sound: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void playSound(Clip clip) {
+        if (clip != null) {
+            new Thread(() -> {
+                synchronized (clip) {
+                    if (clip.isRunning()) {
+                        clip.stop();
+                    }
+                    clip.setFramePosition(0);
+                    clip.start();
                 }
-                if (getPlayerState() == PlayerState.ATTACKING) {
-                        if (getFacingDirection() == Direction.LEFT) {
-                                hitbox.setLocation(getX() + 15 + xOffset, getY() + 18 + yOffset);
-                                attackHitbox.setLocation(getX() + 4, getY() + 38);
-                                attackboxTimer = System.currentTimeMillis();
-                        } else {
-                                hitbox.setLocation(getX() + 11 + xOffset, getY() + 18 + yOffset);
-                                attackHitbox.setLocation(getX() + 50, getY() + 38);
-                                attackboxTimer = System.currentTimeMillis();
-                        }
-                }
+            }).start();
+        }
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        // Check if the player is in the death animation and play death sound once
+        if ((getCurrentAnimationName().equals("DEATH_LEFT") || getCurrentAnimationName().equals("DEATH_RIGHT")) && isAlive && !deathSoundPlayed) {
+            playSound(deathClip); // Play death sound
+            deathSoundPlayed = true; // Prevent replaying the death sound during the same death animation
+            isAlive = false; // Character is now considered "dead"
         }
 
-        public void draw(GraphicsHandler graphicsHandler) {
-                super.draw(graphicsHandler);
-                // hitbox.draw(graphicsHandler);
-                if (getPlayerState() == PlayerState.ATTACKING) {
-                        // attackHitbox.draw(graphicsHandler);
-                }
-                // drawBounds(graphicsHandler, new Color(255, 0, 0, 170));
+        // Reset the death sound flag when the character is respawned or reinitialized
+        if (!getCurrentAnimationName().equals("DEATH_LEFT") && !getCurrentAnimationName().equals("DEATH_RIGHT")) {
+            deathSoundPlayed = false; // Allow death sound to play again on the next death
+            isAlive = true; // Character is "alive" again
         }
 
-        public Rectangle getHitbox() {
-                return this.hitbox; // Getter for hitbox
+        // Logic for playing attack sound
+        if (getPlayerState() == PlayerState.ATTACKING && !isAttacking) {
+            playSound(attackClip);
+            isAttacking = true;
+        }
+        if (getPlayerState() != PlayerState.ATTACKING) {
+            isAttacking = false;
         }
 
-        public Rectangle getAttackHitbox() {
-                return this.attackHitbox; // Getter for hitbox
+        // Existing code for handling hitbox and attack box positioning
+        int xOffset = 5;
+        int yOffset = 15;
+
+        hitbox.setLocation(getX() + xOffset, getY() + yOffset);
+
+        if (getFacingDirection() == Direction.LEFT) {
+            hitbox.setLocation(getX() + 22 + xOffset, getY() + yOffset); // Offset left
+        } else {
+            hitbox.setLocation(getX() + xOffset, getY() + yOffset); // Offset right
         }
+
+        if (System.currentTimeMillis() - attackboxTimer > 300) {
+            attackHitbox.setLocation(1000, 1000);
+        }
+
+        if (getPlayerState() == PlayerState.ATTACKING) {
+            if (getFacingDirection() == Direction.LEFT) {
+                hitbox.setLocation(getX() + 15 + xOffset, getY() + 18 + yOffset);
+                attackHitbox.setLocation(getX() + 4, getY() + 38);
+                attackboxTimer = System.currentTimeMillis();
+            } else {
+                hitbox.setLocation(getX() + 11 + xOffset, getY() + 18 + yOffset);
+                attackHitbox.setLocation(getX() + 50, getY() + 38);
+                attackboxTimer = System.currentTimeMillis();
+            }
+        }
+    }
+
+    @Override
+    public void draw(GraphicsHandler graphicsHandler) {
+        super.draw(graphicsHandler);
+    }
+
+    public Rectangle getHitbox() {
+        return this.hitbox;
+    }
+
+    public Rectangle getAttackHitbox() {
+        return this.attackHitbox;
+    }
 
         @Override
         public HashMap<String, Frame[]> loadAnimations(SpriteSheet spriteSheet) {

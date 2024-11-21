@@ -19,6 +19,7 @@ import Maps.Toad;
 import Maps.ToadsMap;
 import Players.Brawler;
 import Players.Brawler2;
+import Players.Diddy;
 import Players.Knight;
 import Players.Knight2;
 import Players.Mage;
@@ -33,6 +34,9 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.FontMetrics;
 
 public class PlayLevelScreen extends Screen implements PlayerListener {
     protected ScreenCoordinator screenCoordinator;
@@ -49,7 +53,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected LivesDisplay playerOneL;
     protected LivesDisplay playerTwoL;
 
-    protected String[] characters = { "Brawler", "Knight", "Gunner" };
+    protected String[] characters = { "Brawler", "Knight", "Gunner", "Diddy" };
     protected String playerOneChar; // Stores what type of player player one is for hitbox purposes
     protected String playerTwoChar; // Stores what type of player player two is for hitbox purposes
 
@@ -83,6 +87,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     protected boolean isPlayer1Winner; // Field to track if Player 1 is the winner
     protected boolean gameOver = false;
 
+    // Countdown variables
+    private int countdownTimer;
+    private int countdownValue;
+    private boolean countdownComplete;
+
     // Pause menu variables
     protected SpriteFont resumeOption;
     protected SpriteFont exitToMenuOption;
@@ -96,6 +105,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
     // Music-related properties
     protected Clip musicClip;
+
+    // Iterator for Hurtbox Logic
+    int attackArrayIt = 0;
+
+    // Attack Array should be Pixels relative to players hitbox X, Length in frames,
+    // Next Hit Box Pixels
+    int[] brawlerAttackArray;
 
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -140,7 +156,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.GUNNER) {
             this.player = new Mage(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
             playerOneChar = characters[2];
+        } else if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.DIDDY) {
+            this.player = new Diddy(map.getPlayerStartPosition().x, map.getPlayerStartPosition().y);
+            playerOneChar = characters[3];
         }
+
         int player2OffsetX = 430;
         // Setup player 2 based on the selected character
         if (selectedCharacterP2 == CharacterScreen.SelectedCharacter.BRAWLER) {
@@ -156,10 +176,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             this.player2 = new Mage2(map.getPlayerStartPosition().x + player2OffsetX, map.getPlayerStartPosition().y); // Player
                                                                                                                        // 2
             playerTwoChar = characters[2];
-
         }
 
-        // **Assign movement keys for Player 2 (JIKL)**
+        this.player2.setFacingDirection(Direction.LEFT);
+
+        // Assign movement keys for Player 2 (JIKL)
         player2.setMovementKeys(Key.I, Key.J, Key.L, Key.K, Key.O); // JIKL for movement, U for attack
 
         // Attach players to the map and add listeners
@@ -180,6 +201,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         // Play the background music when the PlayLevelScreen starts
         playBackgroundMusic();
+
+        // Initialize countdown
+        countdownTimer = 45; // 180 frames for 3 seconds countdown
+        countdownValue = 3;
+        countdownComplete = false;
     }
 
     // Used to calculate the offset and position of each players hit box
@@ -188,7 +214,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         if (playerOneChar == characters[0]) {
             return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
         } else if (playerOneChar == characters[1]) {
-            return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
+            return new Rectangle((int) player.getX() + 18, (int) player.getY() + 10, 38, 46);
         }
         return new Rectangle((int) player.getX() + 20, (int) player.getY() + 20, 35, 35);
     }
@@ -197,13 +223,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         if (playerTwoChar == characters[0]) {
             return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
         } else if (playerTwoChar == characters[1]) {
-            return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
+            return new Rectangle((int) player2.getX() + 18, (int) player2.getY() + 10, 38, 46);
         }
         return new Rectangle((int) player2.getX() + 20, (int) player2.getY() + 20, 35, 35);
     }
 
     public Rectangle playerOneHurtBox() {
-        if (playerOneChar == characters[0]) {
+        if (playerOneChar == characters[0] || playerOneChar == characters[3]) {
             if (player.getFacingDirection() == Direction.LEFT) {
                 if (player.getPlayerState() == PlayerState.ATTACKING) {
                     return new Rectangle((int) player.getX() - 5, (int) player.getY() + 25, 15, 15);
@@ -211,6 +237,16 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
             } else if (player.getFacingDirection() == Direction.RIGHT) {
                 if (player.getPlayerState() == PlayerState.ATTACKING) {
                     return new Rectangle((int) player.getX() + 60, (int) player.getY() + 25, 15, 15);
+                }
+            }
+        } else if ((playerOneChar == characters[1])) {
+            if (player.getFacingDirection() == Direction.LEFT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() - 10, (int) player.getY() + 25, 25, 12);
+                }
+            } else if (player.getFacingDirection() == Direction.RIGHT) {
+                if (player.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player.getX() + 60, (int) player.getY() + 25, 25, 12);
                 }
             }
         }
@@ -228,9 +264,24 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                     return new Rectangle((int) player2.getX() + 60, (int) player2.getY() + 25, 15, 15);
                 }
             }
+        } else if ((playerTwoChar == characters[1])) {
+            if (player2.getFacingDirection() == Direction.LEFT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() - 10, (int) player2.getY() + 25, 25, 12);
+                }
+            } else if (player2.getFacingDirection() == Direction.RIGHT) {
+                if (player2.getPlayerState() == PlayerState.ATTACKING) {
+                    return new Rectangle((int) player2.getX() + 60, (int) player2.getY() + 25, 25, 12);
+                }
+            }
         }
         return new Rectangle();
 
+    }
+
+    public Rectangle attackArrayLogic(int[] attackArray) {
+
+        return new Rectangle();
     }
 
     public void playerOneHitDetection() {
@@ -279,6 +330,12 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
         if (Keyboard.isKeyUp(Key.ESC)) {
             keyLocker.unlockKey(Key.ESC);
+        }
+
+        // Handle countdown state
+        if (!countdownComplete) {
+            handleCountdown(); // Only handle countdown if it's not complete
+            return; // Skip the rest of the update method until countdown is complete
         }
 
         switch (playLevelScreenState) {
@@ -391,6 +448,23 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         pausePointerLocationY = (int) pauseMenuItems.get(currentPauseMenuItemHovered).getY() - pausePointerOffsetY;
     }
 
+    private void handleCountdown() {
+        // Decrease the countdown timer
+        countdownTimer--;
+
+        // When countdownTimer reaches zero, decrease countdownValue
+        if (countdownTimer <= 0) {
+            countdownValue--; // Move to the next number or "FIGHT!"
+            countdownTimer = 60; // Reset timer for the next countdown step
+
+            // Check if countdown has reached zero, then mark countdown as complete
+            if (countdownValue < 0) {
+                countdownComplete = true;
+            }
+        }
+
+    }
+
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
         switch (playLevelScreenState) {
@@ -399,9 +473,6 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
 
                 player.draw(graphicsHandler); // Draw Player 1
                 player2.draw(graphicsHandler); // Draw Player 2
-
-                // playerOneHitboxPos().draw(graphicsHandler);
-                // playerTwoHitboxPos().draw(graphicsHandler);
 
                 playerOneHitboxPos();
                 playerTwoHitboxPos();
@@ -412,29 +483,27 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 playerOneHitDetection();
                 playerTwoHitDetection();
 
-                if (kbPlayerTwoLeft == true) {
+                if (kbPlayerTwoLeft) {
                     System.out.println("should kb");
-                    if (player2.applyKnockbackLeft() == false) {
+                    if (!player2.applyKnockbackLeft()) {
                         kbPlayerTwoLeft = false;
                     }
-                } else if (kbPlayerTwoRight == true) {
+                } else if (kbPlayerTwoRight) {
                     System.out.println("should kb");
-                    if (player2.applyKnockbackRight() == false) {
+                    if (!player2.applyKnockbackRight()) {
                         kbPlayerTwoRight = false;
                     }
-
                 }
-                if (kbPlayerOneLeft == true) {
+                if (kbPlayerOneLeft) {
                     System.out.println("should kb");
-                    if (player.applyKnockbackLeft() == false) {
+                    if (!player.applyKnockbackLeft()) {
                         kbPlayerOneLeft = false;
                     }
-                } else if (kbPlayerOneRight == true) {
+                } else if (kbPlayerOneRight) {
                     System.out.println("should kb");
-                    if (player.applyKnockbackRight() == false) {
+                    if (!player.applyKnockbackRight()) {
                         kbPlayerOneRight = false;
                     }
-
                 }
 
                 playerOneHB.draw(graphicsHandler, player.getPlayerHealth());
@@ -443,9 +512,13 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
                 playerOneL.draw(graphicsHandler, player.getPlayerLives());
                 playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
-                // Draw Second Health Bar Herea
+                playerOneL.draw(graphicsHandler, player.getPlayerLives());
+                playerTwoL.draw(graphicsHandler, player2.getPlayerLives());
 
-                // Draw health bar
+                // Draw countdown if it's not complete
+                if (!countdownComplete) {
+                    drawCountdown(graphicsHandler);
+                }
 
                 // Only log health when it changes
                 if (player.getPlayerHealth() != previousHealth) {
@@ -487,6 +560,23 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         return playLevelScreenState;
     }
 
+    private void drawCountdown(GraphicsHandler graphicsHandler) {
+        // Determine the text to display
+        String countdownText = (countdownValue > 0) ? String.valueOf(countdownValue) : "FIGHT!";
+
+        // Define font and color
+        Font font = new Font("fibberish", Font.BOLD, 72);
+        Color color = Color.RED;
+
+        // Calculate the position to center the text
+        FontMetrics metrics = graphicsHandler.getGraphics().getFontMetrics(font);
+        int textX = 350 - metrics.stringWidth(countdownText) / 2;
+        int textY = 200 - metrics.getHeight() / 2 + metrics.getAscent();
+
+        // Draw the centered countdown text
+        graphicsHandler.drawString(countdownText, textX, textY, font, color);
+    }
+
     @Override
     public void onLevelCompleted() {
         if (playLevelScreenState != PlayLevelScreenState.LEVEL_COMPLETED) {
@@ -499,7 +589,7 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
     public void onDeath() {
         if (playLevelScreenState != PlayLevelScreenState.LEVEL_LOSE) {
             playLevelScreenState = PlayLevelScreenState.LEVEL_LOSE;
-            stopBackgroundMusic(); // Stop music when the player dies
+            stopBackgroundMusic(); // Stop the music
         }
     }
 

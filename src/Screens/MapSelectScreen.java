@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import javax.sound.sampled.Clip;
+
 public class MapSelectScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
     protected int currentMapItemHovered = 0; // Current map item being hovered over
@@ -24,21 +26,22 @@ public class MapSelectScreen extends Screen {
 
     // Spinning wheel attributes
     protected boolean wheelSpinning = true; // Track if the wheel is spinning
-    protected int wheelSpinTime; // The time for the wheel spin
+    protected int wheelSpinTime = 150; // Spin for 300 frames
     protected Random random;
     protected int selectedPlayer = 0; // 1 for Player 1, 2 for Player 2
     protected boolean wheelFinished = false;
+    protected int postSpinDelay = 120; // Wait for 50 frames after stopping
 
     // Explosion effect attributes
     protected boolean explosionStarted = false; // Track if the explosion has started
-    protected int explosionTime = 30; // Explosion duration in frames (0.5 seconds)
-    protected int pixelExplosionRadius = 0; // Radius of the pixel explosion
+    protected int explosionTime = 70; // Explosion duration in frames (1 second)
+    protected int rippleRadius = 0; // Radius of the ripple explosion
     protected boolean removeWheel = false; // Whether to remove the wheel after explosion
 
     // Wheel visual attributes
     protected float angle = 0; // Current rotation angle of the wheel
     protected float spinSpeed; // The speed of the wheel spinning
-    protected float friction = 0.1f; // Friction factor for slowing down the wheel
+    protected float friction = 0.03f; // Friction factor for slowing down the wheel
 
     // SpriteFont for the result of the wheel spin
     protected SpriteFont wheelResultText;
@@ -74,9 +77,9 @@ public class MapSelectScreen extends Screen {
         wheelResultText.setOutlineColor(Color.black);
         wheelResultText.setOutlineThickness(3);
 
-        // set the random spin time and initial speed
-        wheelSpinTime = 240; //wheel spin time
-        spinSpeed = random.nextFloat() * 5 + 5;  // Random initial speed between 5 and 10
+        // Set the random spin time and initial speed
+        spinSpeed = random.nextFloat() * 10 + 10;  // Random initial speed between 10 and 20
+
     }
 
     @Override
@@ -85,40 +88,47 @@ public class MapSelectScreen extends Screen {
             // The wheel is spinning; decrement spin time
             wheelSpinTime--;
 
-            // Spin the wheel by increasing the angle
+            // Update angle based on current spin speed
             angle += spinSpeed;
 
-            // Gradually decrease the speed to simulate friction
-            spinSpeed = Math.max(spinSpeed - friction, 0);
+            // Gradually decrease speed with friction
+            spinSpeed = Math.max(spinSpeed - friction, 0.05f); // Minimum speed for smoother stop
 
             if (wheelSpinTime <= 0 || spinSpeed <= 0) {
-                // Determine which half the wheel landed on based on the final angle
-                float finalAngle = angle % 360; // Get the final angle between 0 and 360 degrees
-                if (finalAngle >= 0 && finalAngle <= 180) {
-                    // Player 1 (Blue) selects the map
-                    selectedPlayer = 1;
+                // Normalize angle to [0, 360) range
+                float finalAngle = angle % 360;
+                if (finalAngle < 0) {
+                    finalAngle += 360;
+                }
+
+                // Determine which player's segment the wheel lands on
+                if (finalAngle >= 0 && finalAngle < 180) {
+                    selectedPlayer = 1; // Player 1 (Blue)
                     wheelResultText.setText("PLAYER 1 SELECTS THE MAP!");
-                } else {
-                    // Player 2 (Red) selects the map
-                    selectedPlayer = 2;
+                } else if (finalAngle >= 180 && finalAngle < 360) {
+                    selectedPlayer = 2; // Player 2 (Red)
                     wheelResultText.setText("PLAYER 2 SELECTS THE MAP!");
                 }
 
+                // Stop the wheel and start the post-spin delay
                 wheelSpinning = false;
                 wheelFinished = true;
-
-                // Start the explosion effect
-                explosionStarted = true;
+            }
+        } else if (wheelFinished) {
+            // Post-spin delay before removing the wheel
+            postSpinDelay--;
+            if (postSpinDelay <= 0) {
+                explosionStarted = true; // Start the explosion effect
+                wheelFinished = false;
             }
         } else if (explosionStarted) {
-            // Handle the pixelated explosion effect
+            // Handle the ripple explosion effect
             explosionTime--;
-            pixelExplosionRadius += 5; // Smaller particle radius
+            rippleRadius += 15; // Expand the ripple effect faster
 
             if (explosionTime <= 0) {
-                // Explosion is over, remove the wheel
-                removeWheel = true;
-                explosionStarted = false; // Stop the explosion effect
+                explosionStarted = false;
+                removeWheel = true; // Mark wheel as removed after explosion
             }
         } else if (removeWheel) {
             // Proceed to map selection for the chosen player
@@ -126,10 +136,9 @@ public class MapSelectScreen extends Screen {
         }
     }
 
-    // Handle map selection by the player chosen by the wheel
     private void handleMapSelection() {
+        // Player 1 selects the map
         if (selectedPlayer == 1) {
-            // Player 1 selects the map
             if (Keyboard.isKeyDown(Key.S) && keyPressTimer == 0) {
                 keyPressTimer = 14;
                 currentMapItemHovered++;
@@ -137,8 +146,9 @@ public class MapSelectScreen extends Screen {
                 keyPressTimer = 14;
                 currentMapItemHovered--;
             }
-        } else if (selectedPlayer == 2) {
-            // Player 2 selects the map
+        }
+        // Player 2 selects the map
+        else if (selectedPlayer == 2) {
             if (Keyboard.isKeyDown(Key.K) && keyPressTimer == 0) {
                 keyPressTimer = 14;
                 currentMapItemHovered++;
@@ -159,10 +169,10 @@ public class MapSelectScreen extends Screen {
             currentMapItemHovered = mapItems.size() - 1;
         }
 
-        // Update pointer location
+        // Highlight the hovered map item
         for (int i = 0; i < mapItems.size(); i++) {
             if (i == currentMapItemHovered) {
-                mapItems.get(i).setColor(new Color(255, 215, 0)); // Highlighted color
+                mapItems.get(i).setColor(new Color(255, 215, 0)); // Highlight color
                 pointerLocationX = (int) mapItems.get(i).getX() - pointerOffsetX;
                 pointerLocationY = (int) mapItems.get(i).getY() - pointerOffsetY;
             } else {
@@ -200,8 +210,8 @@ public class MapSelectScreen extends Screen {
         }
 
         if (explosionStarted) {
-            // Draw the small red, orange, yellow pixelated explosion effect
-            drawSmallExplosion(graphicsHandler);
+            // Draw the ripple explosion effect
+            drawRippleExplosion(graphicsHandler);
         }
 
         if (wheelFinished && !explosionStarted) {
@@ -215,11 +225,11 @@ public class MapSelectScreen extends Screen {
             }
 
             // Draw the pointer
-            graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
+            Color pointerColor = (selectedPlayer == 1) ? new Color(49, 207, 240) : new Color(240, 49, 49); // Blue for Player 1, Red for Player 2
+            graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor, Color.black, 2);
         }
     }
 
-    // Method to draw the spinning wheel
     private void drawWheel(GraphicsHandler graphicsHandler) {
         // Set the center of the wheel
         int centerX = 400;
@@ -250,40 +260,33 @@ public class MapSelectScreen extends Screen {
         // Reset the transform to the original state
         g2d.setTransform(old);
 
-        // Optional: Add a pointer to indicate where the wheel will stop
+        // Draw a pointer above the wheel
         g2d.setColor(Color.WHITE);
-        g2d.fillPolygon(new int[]{centerX - 10, centerX + 10, centerX}, new int[]{centerY - wheelRadius - 20, centerY - wheelRadius - 20, centerY - wheelRadius}, 3);
+        int pointerHeight = 20;
+        g2d.fillPolygon(
+            new int[]{centerX - 10, centerX + 10, centerX},
+            new int[]{centerY - wheelRadius - pointerHeight, centerY - wheelRadius - pointerHeight, centerY - wheelRadius},
+            3
+        );
     }
-// Method to draw the small red, orange, yellow pixelated explosion effect
-private void drawSmallExplosion(GraphicsHandler graphicsHandler) {
-    Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // Center of explosion
-    int centerX = 400;
-    int centerY = 300;
+;
+    private void drawRippleExplosion(GraphicsHandler graphicsHandler) {
+        Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // Ensure pixelExplosionRadius is a positive number
-    int pixelExplosionRadius = Math.max(1, this.pixelExplosionRadius); // If radius is 0 or negative, default to 1
+        // Center of the ripple explosion
+        int centerX = 400;
+        int centerY = 300;
 
-    // Draw random small rectangles in red, orange, yellow colors
-    for (int i = 0; i < 50; i++) {
-        int randomX = centerX + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
-        int randomY = centerY + random.nextInt(pixelExplosionRadius) - pixelExplosionRadius / 2;
-        
-        // Ensure rectSize is a positive number
-        int rectSize = Math.max(3, random.nextInt(8) + 3); // Minimum size 3
-
-        // Random red, orange, or yellow color
-        Color particleColor = new Color(
-                random.nextInt(56) + 200, // Red/orange tones
-                random.nextInt(150) + 100, // Orange/yellow tones
-                random.nextInt(56));       // Less blue for fiery effect
-
-        g2d.setColor(particleColor);
-        g2d.fillRect(randomX, randomY, rectSize, rectSize); // Draw the small rectangle
+        // Draw concentric circles for the ripple effect
+        for (int i = 0; i < 5; i++) {
+            int currentRadius = rippleRadius - (i * 20);
+            if (currentRadius > 0) {
+                float alpha = Math.max(0, 1.0f - (i * 0.2f)); // Fade outer ripples
+                g2d.setColor(new Color(255, 100, 0, (int) (alpha * 255))); // Fading orange
+                g2d.drawOval(centerX - currentRadius, centerY - currentRadius, currentRadius * 2, currentRadius * 2);
+            }
+        }
     }
 }
-
-}
-
