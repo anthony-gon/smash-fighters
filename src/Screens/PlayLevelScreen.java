@@ -15,6 +15,7 @@ import Level.Player;
 import Level.PlayerListener;
 import Level.PlayerState;
 import Maps.Map2;
+import Maps.Toad;
 import Maps.ToadsMap;
 import Players.Brawler;
 import Players.Brawler2;
@@ -123,9 +124,11 @@ public class PlayLevelScreen extends Screen implements PlayerListener {
         // Initialize map based on selected map name
         if (selectedMapName.equals("Inferno")) {
             this.map = new ToadsMap();
-        } else if (selectedMapName.equals("Ice Kingdom")) {
+        } else if (selectedMapName.equals("Tundra")) {
             this.map = new Map2();
-        }
+        } else if (selectedMapName.equals("Toads")) {
+            this.map = new Toad();
+        } 
 
         // Setup player 1 based on the selected character
         if (selectedCharacterP1 == CharacterScreen.SelectedCharacter.BRAWLER) {

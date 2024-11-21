@@ -2,6 +2,7 @@ package Level;
 
 import Engine.Config;
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
 import Engine.ScreenManager;
 import Utils.Point;
 
@@ -11,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.awt.image.BufferedImage;
 
 /*
     This class is for defining a map that is used for a specific level
@@ -383,8 +385,13 @@ public abstract class Map {
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
+        BufferedImage bgImage = ImageLoader.load("toadsBackround.png");
+
+        graphicsHandler.drawImage(bgImage,  0, 0, bgImage.getWidth()*5, bgImage.getHeight()*5);
+
         camera.draw(graphicsHandler);
     }
+
 
     public int getEndBoundX() {
         return endBoundX;
