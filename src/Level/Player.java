@@ -79,17 +79,14 @@ public abstract class Player extends GameObject {
     public int getPlayerLives() {
         return this.playerLives;
     }
- 
 
     public void damagePlayer(int damage) {
         this.playerHealth -= damage;
     }
 
-
     public void resetHealth(int extraHealth) {
         this.playerHealth += extraHealth;
     }
-
 
     public void removeLives(int lives) {
         this.playerLives -= lives;
@@ -97,10 +94,9 @@ public abstract class Player extends GameObject {
 
     public void setLocation(Point newPosition) {
         this.setX(x);
-        this.setY(y); 
+        this.setY(y);
     }
 
-    
     public void playerCastHitbox(int hitBox) {
 
     }
@@ -252,9 +248,6 @@ public abstract class Player extends GameObject {
             playerState = PlayerState.JUMPING;
         }
 
-        
-        
-
         // if player is in air (currently in a jump) and has more jumpForce, continue
         // sending player upwards
         else if (airGroundState == AirGroundState.AIR) {
@@ -289,6 +282,15 @@ public abstract class Player extends GameObject {
         else if (previousAirGroundState == AirGroundState.AIR && airGroundState == AirGroundState.GROUND) {
             playerState = PlayerState.STANDING;
         }
+    }
+
+    public void lockAttack() {
+        keyLocker.lockKey(ATTACK_KEY);
+        System.out.println("button is locked");
+    }
+
+    public void unlockAttack() {
+        keyLocker.unlockKey(ATTACK_KEY);
     }
 
     // player JUMPING state logic
@@ -430,14 +432,12 @@ public abstract class Player extends GameObject {
                 this.currentAnimationName = facingDirection == Direction.RIGHT ? "ATTACK_RIGHT" : "ATTACK_LEFT";
             }
 
-
-
             if (lastAmountMovedY <= 0) {
                 this.currentAnimationName = facingDirection == Direction.RIGHT ? "JUMP_RIGHT" : "JUMP_LEFT";
             } else {
                 this.currentAnimationName = facingDirection == Direction.RIGHT ? "FALL_RIGHT" : "FALL_LEFT";
             }
-        
+
         } else if (playerState == PlayerState.ATTACKING) {
             this.currentAnimationName = facingDirection == Direction.RIGHT ? "ATTACK_RIGHT" : "ATTACK_LEFT";
         }

@@ -17,7 +17,7 @@ public class MapSelectScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
     protected int currentMapItemHovered = 0; // Current map item being hovered over
     protected List<SpriteFont> mapItems; // List to hold map buttons
-    protected SpriteFont map1, map2; // Buttons for maps
+    protected SpriteFont map1, map2, map3; // Buttons for maps
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
     protected int pointerOffsetX = 30;
@@ -62,8 +62,12 @@ public class MapSelectScreen extends Screen {
         map2.setOutlineColor(Color.black);
         map2.setOutlineThickness(3);
 
+        map3 = new SpriteFont("Toads", 300, 400, "fibberish", 30, new Color(49, 207, 240));
+        map3.setOutlineColor(Color.black);
+        map3.setOutlineThickness(3);
+
         // Add items to the mapItems list
-        mapItems = Arrays.asList(map1, map2);
+        mapItems = Arrays.asList(map1, map2, map3);
 
         keyPressTimer = 0;
         keyLocker.lockKey(Key.SPACE); // Lock the key initially
