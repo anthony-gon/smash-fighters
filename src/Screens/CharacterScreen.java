@@ -127,7 +127,7 @@ public class CharacterScreen extends Screen {
                 brawler.setText("Baby Oil Man");
                 keyPressTimer = 14;
             } else {
-                brawler.setText("Brawler");
+                brawler.setText("BRAWLER");
                 keyPressTimer = 14;
             }
         }
@@ -136,7 +136,7 @@ public class CharacterScreen extends Screen {
             // When a character is selected, assign it to Player 1
             switch (currentCharacterItemHovered) {
                 case 0:
-                    if (brawler.getText() == "Brawler") {
+                    if (brawler.getText() == "BRAWLER") {
                         selectedCharacterP1 = SelectedCharacter.BRAWLER;
                         brawler.setText("Brawler");
                     } else {

@@ -18,7 +18,7 @@ public class Map2 extends Map {
 
     public Map2() {
         super("map2.txt", new Map2Tileset());
-        this.playerStartPosition = new Point(109, 100);
+        this.playerStartPosition = new Point(120, 100);
     }
 
     @Override

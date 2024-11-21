@@ -23,6 +23,7 @@ public class MapSelectScreen extends Screen {
     protected int pointerOffsetX = 30;
     protected int pointerOffsetY = 7;
     protected KeyLocker keyLocker = new KeyLocker();
+    public String selectedMapName;
 
     // Spinning wheel attributes
     protected boolean wheelSpinning = true; // Track if the wheel is spinning
@@ -78,7 +79,7 @@ public class MapSelectScreen extends Screen {
         wheelResultText.setOutlineThickness(3);
 
         // Set the random spin time and initial speed
-        spinSpeed = random.nextFloat() * 10 + 10;  // Random initial speed between 10 and 20
+        spinSpeed = random.nextFloat() * 10 + 10; // Random initial speed between 10 and 20
 
     }
 
@@ -194,7 +195,7 @@ public class MapSelectScreen extends Screen {
         }
         if (!keyLocker.isKeyLocked(selectKey) && Keyboard.isKeyDown(selectKey)) {
             // When a map is selected, set the selected map in ScreenCoordinator
-            String selectedMapName = mapItems.get(currentMapItemHovered).getText(); // Get the map name text
+            selectedMapName = mapItems.get(currentMapItemHovered).getText(); // Get the map name text
             System.out.println("Selected Map: " + selectedMapName); // Debug
             screenCoordinator.setSelectedMap(selectedMapName);
 
@@ -225,8 +226,12 @@ public class MapSelectScreen extends Screen {
             }
 
             // Draw the pointer
-            Color pointerColor = (selectedPlayer == 1) ? new Color(49, 207, 240) : new Color(240, 49, 49); // Blue for Player 1, Red for Player 2
-            graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor, Color.black, 2);
+            Color pointerColor = (selectedPlayer == 1) ? new Color(49, 207, 240) : new Color(240, 49, 49); // Blue for
+                                                                                                           // Player 1,
+                                                                                                           // Red for
+                                                                                                           // Player 2
+            graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, pointerColor,
+                    Color.black, 2);
         }
     }
 
@@ -264,13 +269,14 @@ public class MapSelectScreen extends Screen {
         g2d.setColor(Color.WHITE);
         int pointerHeight = 20;
         g2d.fillPolygon(
-            new int[]{centerX - 10, centerX + 10, centerX},
-            new int[]{centerY - wheelRadius - pointerHeight, centerY - wheelRadius - pointerHeight, centerY - wheelRadius},
-            3
-        );
+                new int[] { centerX - 10, centerX + 10, centerX },
+                new int[] { centerY - wheelRadius - pointerHeight, centerY - wheelRadius - pointerHeight,
+                        centerY - wheelRadius },
+                3);
     }
 
-;
+    ;
+
     private void drawRippleExplosion(GraphicsHandler graphicsHandler) {
         Graphics2D g2d = (Graphics2D) graphicsHandler.getGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

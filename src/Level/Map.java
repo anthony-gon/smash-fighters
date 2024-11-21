@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.awt.image.BufferedImage;
 
+import Screens.MapSelectScreen;
+
 /*
     This class is for defining a map that is used for a specific level
     The map class handles/manages a lot of different things, including:
@@ -356,8 +358,6 @@ public abstract class Map {
         camera.update(player);
     }
 
-    
-
     // based on the player's current X position (which in a level can potentially be
     // updated each frame),
     // adjust the player's and camera's positions accordingly in order to properly
@@ -366,8 +366,6 @@ public abstract class Map {
     // Editted, Stops Screen Movement
     private void adjustMovementX(Player player) {
     }
-
-    
 
     // based on the player's current Y position (which in a level can potentially be
     // updated each frame),
@@ -378,20 +376,18 @@ public abstract class Map {
     private void adjustMovementY(Player player) {
     }
 
-    
-
     public void reset() {
         setupMap();
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
-        BufferedImage bgImage = ImageLoader.load("toadsBackround.png");
-
-        graphicsHandler.drawImage(bgImage,  0, 0, bgImage.getWidth()*5, bgImage.getHeight()*5);
-
         camera.draw(graphicsHandler);
-    }
+        BufferedImage bgImage = ImageLoader.load("toadsBackground.png");
+        if (this.mapFileName == "toadsmap.txt") {
+            graphicsHandler.drawImage(bgImage, 0, 0, bgImage.getWidth() * 4, bgImage.getHeight() * 4);
+        }
 
+    }
 
     public int getEndBoundX() {
         return endBoundX;
