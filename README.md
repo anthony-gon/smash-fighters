@@ -4,6 +4,7 @@
 This is a game created for Quinnipiac's SER225 Agile Development class.
 Students will be paired up in teams for an entire semester, and will utilize agile development to work further on this game.
 This usually involves adding features and fixing bugs (I'm sure there are bugs...)
+This game was altered to become a smash bros parody. There are different options for maps and characters in which you can use.
 
 ## How to run this project?
 I did not use any external libraries for this, so you can clone this repo as is and run it out of the box with Java (min version 8).
@@ -20,3 +21,8 @@ Changes to content in the `docs` folder will not show up on the website unless t
 
 ## Credits
 **Alex Thimineur**: Programmed the game, made the art.
+**Anthony Gonzalez**
+**Samuel Joor**
+**Hayden Ward**
+**Benjamin Delton**
+**Mario Panagrosso**
