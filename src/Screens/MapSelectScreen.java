@@ -55,7 +55,7 @@ public class MapSelectScreen extends Screen {
     @Override
     public void initialize() {
         // Initialize the map select buttons
-        map1 = new SpriteFont("Inferno", 300, 200, "fibberish", 30, new Color(49, 207, 240));
+        map1 = new SpriteFont("Toads Map", 300, 200, "fibberish", 30, new Color(49, 207, 240));
         map1.setOutlineColor(Color.black);
         map1.setOutlineThickness(3);
 
@@ -63,7 +63,7 @@ public class MapSelectScreen extends Screen {
         map2.setOutlineColor(Color.black);
         map2.setOutlineThickness(3);
 
-        map3 = new SpriteFont("Toads", 300, 400, "fibberish", 30, new Color(49, 207, 240));
+        map3 = new SpriteFont("Inferno", 300, 400, "fibberish", 30, new Color(49, 207, 240));
         map3.setOutlineColor(Color.black);
         map3.setOutlineThickness(3);
 
@@ -197,7 +197,13 @@ public class MapSelectScreen extends Screen {
             // When a map is selected, set the selected map in ScreenCoordinator
             selectedMapName = mapItems.get(currentMapItemHovered).getText(); // Get the map name text
             System.out.println("Selected Map: " + selectedMapName); // Debug
-            screenCoordinator.setSelectedMap(selectedMapName);
+            if (selectedMapName == "Toads Map") {
+                screenCoordinator.setSelectedMap("Inferno");
+            } else if (selectedMapName == "Inferno") {
+                screenCoordinator.setSelectedMap("Toads");
+            } else {
+                screenCoordinator.setSelectedMap(selectedMapName);
+            }
 
             // Transition to the character select screen
             screenCoordinator.setGameState(GameState.CHARACTER);
